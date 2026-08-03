@@ -31,7 +31,6 @@ public class Main2 extends Application {
         mainScreen.setPadding(new Insets(20));
         Label label = new Label("Main Screen");
 
-
         Button startButton = new Button("Start Game");
         //this button doesn't link anywhere
         //startButton.setOnAction(e->GameScreenMethodHere());
@@ -40,7 +39,9 @@ public class Main2 extends Application {
         //configButton.setOnAction(e->ConfigScreenMethodHere());
 
         Button exitButton = new Button("Exit");
-
+        exitButton.setOnAction(e -> {
+            System.exit(0);
+        });
 
         mainScreen.getChildren().addAll(label, startButton, configButton, exitButton);
         root.getChildren().addAll(mainScreen);
@@ -84,6 +85,5 @@ public class Main2 extends Application {
         Scene scene = new Scene(root, widthBase, heightBase);
         primaryStage.setTitle("Tetris OOSD!");
         primaryStage.setScene(scene);
-
     }
 }
