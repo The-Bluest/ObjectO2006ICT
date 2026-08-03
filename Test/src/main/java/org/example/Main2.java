@@ -35,16 +35,40 @@ public class Main2 extends Application {
         //this button doesn't link anywhere
         //startButton.setOnAction(e->GameScreenMethodHere());
 
+        Button highScoreButton = new Button("High Scores");
+        highScoreButton.setOnAction(e -> showHighScoreScreen());
+
         Button configButton = new Button("Configuration");
-        //configButton.setOnAction(e->ConfigScreenMethodHere());
+        configButton.setOnAction(e -> showConfigScreen());
 
         Button exitButton = new Button("Exit");
         exitButton.setOnAction(e -> {
             System.exit(0);
         });
 
-        mainScreen.getChildren().addAll(label, startButton, configButton, exitButton);
-        root.getChildren().addAll(mainScreen);
+        mainScreen.getChildren().addAll(label, startButton, highScoreButton, configButton, exitButton);
+        root.getChildren().setAll(mainScreen);
+    }
+
+    private void showConfigScreen() {
+        VBox configScreen = new VBox(10);
+        configScreen.setPadding(new Insets(20));
+        Label label = new Label("Config");
+        Button back = new Button("Return to Menu");
+        back.setOnAction(e -> showMainScreen());
+
+        configScreen.getChildren().addAll(label, back);
+        root.getChildren().setAll(configScreen);
+    }
+
+    private void showHighScoreScreen() {
+        VBox HScreen = new VBox(10);
+        HScreen.setPadding(new Insets(20));
+        Label label = new Label("High Score Screen");
+        Button back = new Button("Return to Menu");
+        back.setOnAction(e -> showMainScreen());
+        HScreen.getChildren().addAll(label, back);
+        root.getChildren().setAll(HScreen);
     }
 
     @Override
