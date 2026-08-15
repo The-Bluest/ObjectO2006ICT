@@ -6,7 +6,9 @@ import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -14,6 +16,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+//import java.awt.*;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -23,8 +27,14 @@ public class Main2 extends Application {
     }
 
     private StackPane root;
-    private final double widthBase = 400;
-    private final double heightBase = 300;
+    private final double widthBase = 500;
+    private final double heightBase = 400;
+
+    private int gameHeight = 16;
+    private int gameWidth = 8;
+    private double gameSpeed = 5;
+    private boolean musicBool = true;
+    private boolean sfxBool = true;
 
     private void showMainScreen() {
         VBox mainScreen = new VBox(10);
@@ -54,10 +64,57 @@ public class Main2 extends Application {
         VBox configScreen = new VBox(10);
         configScreen.setPadding(new Insets(20));
         Label label = new Label("Config");
+        Label heightLabel = new Label("Game Height");
+        Slider height = new Slider(8, 24, gameHeight);
+        height.setMajorTickUnit(1);
+        height.setMinorTickCount(0);
+        height.setSnapToTicks(true);
+        height.setShowTickMarks(true);
+        height.setShowTickLabels(true);
+        height.valueProperty().addListener((observable, oldValue, newValue) -> {
+            gameHeight = newValue.intValue();
+        });
+        Label widthLabel = new Label("Game Width");
+        Slider width = new Slider(4, 12, gameWidth);
+        width.setMajorTickUnit(1);
+        width.setMinorTickCount(0);
+        width.setSnapToTicks(true);
+        width.setShowTickMarks(true);
+        width.setShowTickLabels(true);
+        width.valueProperty().addListener((observable, oldValue, newValue) -> {
+            gameWidth = newValue.intValue();
+        });
+        Label speedLabel = new Label("Game Speed");
+        Slider speed = new Slider(1, 10, gameSpeed);
+        speed.setMajorTickUnit(1);
+        speed.setMinorTickCount(0);
+        speed.setShowTickMarks(true);
+        speed.setShowTickLabels(true);
+        speed.valueProperty().addListener((observable, oldValue, newValue) -> {
+            gameSpeed = newValue.doubleValue();
+        });
+        CheckBox music = new CheckBox("Enable Music?");
+        music.setSelected(musicBool);
+        music.setOnAction(event -> {
+            if (music.isSelected()) {
+                musicBool = true;
+            } else {
+                musicBool = false;
+            }
+        });
+        CheckBox sfx = new CheckBox("Enable sfx?");
+        sfx.setSelected(sfxBool);
+        sfx.setOnAction(event -> {
+            if (sfx.isSelected()) {
+                sfxBool = true;
+            } else {
+                sfxBool = false;
+            }
+        });
         Button back = new Button("Return to Menu");
         back.setOnAction(e -> showMainScreen());
 
-        configScreen.getChildren().addAll(label, back);
+        configScreen.getChildren().addAll(label, heightLabel, height, widthLabel, width, speedLabel, speed, music, sfx, back);
         root.getChildren().setAll(configScreen);
     }
 
