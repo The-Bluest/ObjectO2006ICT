@@ -1,5 +1,6 @@
 package org.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -17,6 +18,10 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.*;
+import java.util.ArrayList;
+
+
 //import java.awt.*;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -26,6 +31,9 @@ public class Main2 extends Application {
         launch(args);
     }
 
+    private ArrayList<Integer> highscores;
+    private ObjectMapper mapper = new ObjectMapper();
+    private File highFile = new File("./thing.txt");
     private StackPane root;
     private final double widthBase = 500;
     private final double heightBase = 400;
@@ -37,6 +45,44 @@ public class Main2 extends Application {
     private boolean sfxBool = true;
 
     private void showMainScreen() {
+        boolean err = false;
+        highscores = new ArrayList<Integer>();
+        try {
+
+            BufferedReader bf = new BufferedReader(new FileReader(highFile));
+            String line = bf.readLine();
+            while (line != null) {
+                highscores.add(Integer.parseInt(line));
+                line = bf.readLine();
+            }
+
+
+        } catch (java.io.FileNotFoundException e) {
+            System.out.println("File Not Found");
+            err = true;
+        } catch (java.io.IOException e) {
+            System.out.print("IOException");
+            err = true;
+        }
+
+        if (err) {
+            ArrayList<Integer> output = new ArrayList<Integer>();
+            output.add(0);
+            output.add(0);
+            output.add(0);
+            output.add(0);
+            output.add(0);
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("./thing.txt"))) {
+                for (Integer out : output) {
+                    writer.write(out.toString());
+                    writer.newLine();
+                }
+            } catch (java.io.IOException e) {
+                System.out.println("Error in print???");
+            }
+        }
+
+
         VBox mainScreen = new VBox(10);
         mainScreen.setPadding(new Insets(20));
         Label label = new Label("Main Screen");
@@ -59,6 +105,7 @@ public class Main2 extends Application {
         mainScreen.getChildren().addAll(label, startButton, highScoreButton, configButton, exitButton);
         root.getChildren().setAll(mainScreen);
     }
+
 
     private void showConfigScreen() {
         VBox configScreen = new VBox(10);
@@ -122,9 +169,15 @@ public class Main2 extends Application {
         VBox HScreen = new VBox(10);
         HScreen.setPadding(new Insets(20));
         Label label = new Label("High Score Screen");
+        HScreen.getChildren().add(label);
+        int scoreTal = 1;
+        for (Integer score : highscores) {
+            HScreen.getChildren().add(new Label(scoreTal + ":   " + score));
+            scoreTal += 1;
+        }
         Button back = new Button("Return to Menu");
         back.setOnAction(e -> showMainScreen());
-        HScreen.getChildren().addAll(label, back);
+        HScreen.getChildren().add(back);
         root.getChildren().setAll(HScreen);
     }
 
