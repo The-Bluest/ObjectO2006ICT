@@ -1,6 +1,5 @@
 package org.example;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -32,7 +31,6 @@ public class Main2 extends Application {
     }
 
     private ArrayList<Integer> highscores;
-    private ObjectMapper mapper = new ObjectMapper();
     private File highFile = new File("./thing.txt");
     private StackPane root;
     private final double widthBase = 500;
