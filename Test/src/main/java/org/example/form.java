@@ -1,24 +1,27 @@
+package org.example;
+
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public  class form {
+public class form {
     // each part of the shape 
-    Rectangle a; 
-    Rectangle b; 
-    Rectangle c; 
-    Rectangle d; 
+    Rectangle a;
+    Rectangle b;
+    Rectangle c;
+    Rectangle d;
     Color color;
     private String name;
     public int form = 1;
 
     //shape instructions
-    public form (Rectangle a, Rectangle b, Rectangle c, Rectangle d){
+    public form(Rectangle a, Rectangle b, Rectangle c, Rectangle d) {
         this.a = a;
         this.b = b;
         this.c = c;
         this.d = d;
     }
-    public form (Rectangle a, Rectangle b, Rectangle c, Rectangle d, String name){
+
+    public form(Rectangle a, Rectangle b, Rectangle c, Rectangle d, String name) {
         this.a = a;
         this.b = b;
         this.c = c;
@@ -48,7 +51,7 @@ public  class form {
             case "line":
                 color = Color.AQUA;
                 break;
-    }
+        }
         //applies the above colours to each dimension.
         this.a.setFill(color);
         this.a.setFill(color);
@@ -56,14 +59,15 @@ public  class form {
         this.a.setFill(color);
 
     }
+
     public String getName() {
         return name;
     }
 
-    public void changeForm(){
-        if (form !=4) {
+    public void changeForm() {
+        if (form != 4) {
             form++;
-            }else{
+        } else {
             form = 1;
         }
     }
