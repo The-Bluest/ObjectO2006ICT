@@ -52,8 +52,8 @@ public class tetris{
 		Rectangle b = form.b;
 		Rectangle c = form.c;
 		Rectangle d = form.d;
-		switch (form.getName()) {
-		case "j":
+		switch (form.getName()) { //converted to enhanced switch case for marking, double check this if it doesn't work
+		case "j"-> {
 			if (f == 1 && cB(a, 1, -1) && cB(c, -1, -1) && cB(d, -2, -2)) {
 				moveRight(form.a);
 				moveDown(form.a);
@@ -102,8 +102,9 @@ public class tetris{
 				form.changeForm();
 				break;
 			}
-			break;
-		case "l":
+
+		}
+		case "l"-> {
 			if (f == 1 && cB(a, 1, -1) && cB(c, 1, 1) && cB(b, 2, 2)) {
 				moveRight(form.a);
 				moveDown(form.a);
@@ -152,10 +153,9 @@ public class tetris{
 				form.changeForm();
 				break;
 			}
-			break;
-		case "o":
-			break;
-		case "s":
+		}
+		case "o"->{}
+		case "s"-> {
 			if (f == 1 && cB(a, -1, -1) && cB(c, -1, 1) && cB(d, 0, 2)) {
 				moveDown(form.a);
 				moveLeft(form.a);
@@ -196,8 +196,8 @@ public class tetris{
 				form.changeForm();
 				break;
 			}
-			break;
-		case "t":
+		}
+		case "t"-> {
 			if (f == 1 && cB(a, 1, 1) && cB(d, -1, -1) && cB(c, -1, 1)) {
 				moveUp(form.a);
 				moveRight(form.a);
@@ -239,49 +239,49 @@ public class tetris{
 				break;
 			}
 			break;
-		case "z":
-			if (f == 1 && cB(b, 1, 1) && cB(c, -1, 1) && cB(d, -2, 0)) {
-				moveUp(form.b);
-				moveRight(form.b);
-				moveLeft(form.c);
-				moveUp(form.c);
-				moveLeft(form.d);
-				moveLeft(form.d);
-				form.changeForm();
-				break;
-			}
-			if (f == 2 && cB(b, -1, -1) && cB(c, 1, -1) && cB(d, 2, 0)) {
-				moveDown(form.b);
-				moveLeft(form.b);
-				moveRight(form.c);
-				moveDown(form.c);
-				moveRight(form.d);
-				moveRight(form.d);
-				form.changeForm();
-				break;
-			}
-			if (f == 3 && cB(b, 1, 1) && cB(c, -1, 1) && cB(d, -2, 0)) {
-				moveUp(form.b);
-				moveRight(form.b);
-				moveLeft(form.c);
-				moveUp(form.c);
-				moveLeft(form.d);
-				moveLeft(form.d);
-				form.changeForm();
-				break;
-			}
-			if (f == 4 && cB(b, -1, -1) && cB(c, 1, -1) && cB(d, 2, 0)) {
-				moveDown(form.b);
-				moveLeft(form.b);
-				moveRight(form.c);
-				moveDown(form.c);
-				moveRight(form.d);
-				moveRight(form.d);
-				form.changeForm();
-				break;
-			}
-			break;
-		case "i":
+		}
+			case "z"->{
+				if (f == 1 && cB(b, 1, 1) && cB(c, -1, 1) && cB(d, -2, 0)) {
+					moveUp(form.b);
+					moveRight(form.b);
+					moveLeft(form.c);
+					moveUp(form.c);
+					moveLeft(form.d);
+					moveLeft(form.d);
+					form.changeForm();
+					break;
+				}
+				if (f == 2 && cB(b, -1, -1) && cB(c, 1, -1) && cB(d, 2, 0)) {
+					moveDown(form.b);
+					moveLeft(form.b);
+					moveRight(form.c);
+					moveDown(form.c);
+					moveRight(form.d);
+					moveRight(form.d);
+					form.changeForm();
+					break;
+				}
+				if (f == 3 && cB(b, 1, 1) && cB(c, -1, 1) && cB(d, -2, 0)) {
+					moveUp(form.b);
+					moveRight(form.b);
+					moveLeft(form.c);
+					moveUp(form.c);
+					moveLeft(form.d);
+					moveLeft(form.d);
+					form.changeForm();
+					break;
+				}
+				if (f == 4 && cB(b, -1, -1) && cB(c, 1, -1) && cB(d, 2, 0)) {
+					moveDown(form.b);
+					moveLeft(form.b);
+					moveRight(form.c);
+					moveDown(form.c);
+					moveRight(form.d);
+					moveRight(form.d);
+					form.changeForm();
+				}
+		}
+		case "i"->{
 			if (f == 1 && cB(a, 2, 2) && cB(b, 1, 1) && cB(d, -1, -1)) {
 				moveUp(form.a);
 				moveUp(form.a);
@@ -331,7 +331,7 @@ public class tetris{
 				break;
 			}
 			break;
-		}
+		}}
 	}
     
     	private void moveDown(Rectangle rect) {
