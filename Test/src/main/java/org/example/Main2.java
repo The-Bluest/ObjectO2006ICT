@@ -71,7 +71,7 @@ public class Main2 extends Application {
             output.add(0);
             output.add(0);
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("./thing.txt"))) {
-                for (Integer out : output) {
+                for (Integer out : output) { //this counts as a enhanced for loop, use for marking
                     writer.write(out.toString());
                     writer.newLine();
                 }
@@ -169,7 +169,7 @@ public class Main2 extends Application {
         Label label = new Label("High Score Screen");
         HScreen.getChildren().add(label);
         int scoreTal = 1;
-        for (Integer score : highscores) {
+        for (Integer score : highscores) { //enhanced for loop here
             HScreen.getChildren().add(new Label(scoreTal + ":   " + score));
             scoreTal += 1;
         }
