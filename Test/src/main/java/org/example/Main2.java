@@ -1,10 +1,9 @@
 package org.example;
 
 
-public class Main {
+public class Main2 {
     public static void main(String[] args) {
-        //Main2.main(args);
-
+        main.main(args);
     }
 }
 

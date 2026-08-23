@@ -54,9 +54,9 @@ public class form {
         }
         //applies the above colours to each dimension.
         this.a.setFill(color);
-        this.a.setFill(color);
-        this.a.setFill(color);
-        this.a.setFill(color);
+        this.b.setFill(color);
+        this.c.setFill(color);
+        this.d.setFill(color);
 
     }
 

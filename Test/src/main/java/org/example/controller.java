@@ -5,11 +5,11 @@ import javafx.scene.shape.Rectangle;
 
 public class controller {
     // get from org.example.tetris for control
-    public static final int move = Tetris.move;
-    public static final int size = Tetris.size;
-    public static int xMax = Tetris.xMax;
-    public static int yMax = Tetris.yMax;
-    public static int[][] mesh = Tetris.mesh;
+    public static final int move = main.move;
+    public static final int size = main.size;
+    public static int xMax = main.xMax;
+    public static int yMax = main.yMax;
+    public static int[][] mesh = main.mesh;
 
     public static void moveRight(form form) {
         if (form.a.getX() + move <= xMax - size && form.b.getX() + move <= xMax - size && form.c.getX() + move <= xMax - size && form.d.getX() + move <= xMax - size) {
@@ -70,8 +70,7 @@ public class controller {
         } else if (block < 45) { //square 15%
             a.setX(xMax / 2 - size);
             b.setX(xMax / 2);
-            b.setY(xMax / 2 - size);
-            //c.setX(size);
+            c.setX(xMax / 2 - size);
             c.setY(size);
             d.setX(xMax / 2);
             d.setY(size);
