@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -38,6 +39,9 @@ public class Tetris {
     private static int linesNo = 0;
     private static Text pausedText;
     private Runnable onGameOver;
+    private static final int fallInterval = 300;
+    private static final int fastFallInterval = 60; // rate while DOWN is held
+    private static boolean fastFall = false;
 
 
 
@@ -84,12 +88,28 @@ public class Tetris {
         nextObj = controller.makeShape();
 
         Timer fall = new Timer();
+        Button menuButton = new Button("Back to Menu");
+        menuButton.setLayoutX(xMax + 5);
+        menuButton.setLayoutY(150);
+        menuButton.setOnAction(e -> {
+            fall.cancel();
+            game = false;
+            if (onGameOver != null)
+                onGameOver.run();
+        });
+        groupe.getChildren().add(menuButton);
+        final int tickMs = 30;
+        final int[] elapsed = {0};
         TimerTask task = new TimerTask() {
             public void run() {
                 Platform.runLater(new Runnable() {
                     public void run() {
                         if (paused)
                             return;
+                        elapsed[0] += tickMs;
+                        if (elapsed[0] < (fastFall ? fastFallInterval : fallInterval))
+                            return;
+                        elapsed[0] = 0;
                         boolean atTop = object.a.getY() == 0 || object.b.getY() == 0 || object.c.getY() == 0
                                 || object.d.getY() == 0;
                         // only a genuinely stuck piece (blocked right at spawn) counts toward game over
@@ -125,7 +145,7 @@ public class Tetris {
                 });
             }
         };
-        fall.schedule(task, 0, 300);
+        fall.schedule(task, 0, tickMs);
     }
 
 
@@ -145,12 +165,8 @@ public class Tetris {
                         controller.moveRight(form);
                         break;
                     case DOWN:
-                        // slam the piece straight down and lock it in immediately
-                        while (!isBlockedBelow(form)) {
-                            moveDown(form);
-                            score++;
-                        }
-                        moveDown(form);
+                        // hold to fall faster instead of slamming straight to the bottom
+                        fastFall = true;
                         break;
                     case LEFT:
                         controller.moveLeft(form);
@@ -159,6 +175,13 @@ public class Tetris {
                         MoveTurn(form);
                         break;
                 }
+            }
+        });
+        scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (event.getCode() == KeyCode.DOWN)
+                    fastFall = false;
             }
         });
     }
