@@ -20,7 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class main extends Application {
+public class Tetris extends Application {
     //variables
     public static final int move = 25; //Settings dependent
     public static final int size = 25;// settings dependent if movable by 1 value

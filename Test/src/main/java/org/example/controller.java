@@ -5,11 +5,11 @@ import javafx.scene.shape.Rectangle;
 
 public class controller {
     // get from org.example.tetris for control
-    public static final int move = main.move;
-    public static final int size = main.size;
-    public static int xMax = main.xMax;
-    public static int yMax = main.yMax;
-    public static int[][] mesh = main.mesh;
+    public static final int move = Tetris.move;
+    public static final int size = Tetris.size;
+    public static int xMax = Tetris.xMax;
+    public static int yMax = Tetris.yMax;
+    public static int[][] mesh = Tetris.mesh;
 
     public static void moveRight(form form) {
         if (form.a.getX() + move <= xMax - size && form.b.getX() + move <= xMax - size && form.c.getX() + move <= xMax - size && form.d.getX() + move <= xMax - size) {
