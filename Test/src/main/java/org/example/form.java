@@ -45,7 +45,7 @@ public class form {
             case "t":
                 color = Color.PINK;
                 break;
-            case "zag":
+            case "s":
                 color = Color.RED;
                 break;
             case "line":

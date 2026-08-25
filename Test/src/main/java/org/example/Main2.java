@@ -34,7 +34,7 @@ public class Main2 extends Application {
     private File highFile = new File("./thing.txt");
     private StackPane root;
     private final double widthBase = 500;
-    private final double heightBase = 400;
+    private final double heightBase = Tetris.yMax + 20; // tall enough to fit the Tetris board
 
     private int gameHeight = 16;
     private int gameWidth = 8;
@@ -86,8 +86,7 @@ public class Main2 extends Application {
         Label label = new Label("Main Screen");
 
         Button startButton = new Button("Start Game");
-        //this button doesn't link anywhere
-        //startButton.setOnAction(e->GameScreenMethodHere());
+        startButton.setOnAction(e->beginGame());
 
         Button highScoreButton = new Button("High Scores");
         highScoreButton.setOnAction(e -> showHighScoreScreen());
@@ -102,6 +101,14 @@ public class Main2 extends Application {
 
         mainScreen.getChildren().addAll(label, startButton, highScoreButton, configButton, exitButton);
         root.getChildren().setAll(mainScreen);
+    }
+
+    private void beginGame(){
+        try {
+            new Tetris().start(root, this::showMainScreen);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

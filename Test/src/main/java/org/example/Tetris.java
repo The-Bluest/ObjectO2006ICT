@@ -7,10 +7,10 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.application.Platform;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
 
@@ -20,7 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Tetris extends Application {
+public class Tetris {
     //variables
     public static final int move = 25; //Settings dependent
     public static final int size = 25;// settings dependent if movable by 1 value
@@ -37,19 +37,24 @@ public class Tetris extends Application {
     private static form nextObj;
     private static int linesNo = 0;
     private static Text pausedText;
+    private Runnable onGameOver;
 
-    //make scene start game maybe trigger from screen
-	public static void main(String[] args){
-        launch(args);
-    }
-    //left 18min score and text left.
-    @Override
-    public void start(Stage stage) throws Exception {
+
+
+    public void start(StackPane root, Runnable onGameOver) throws Exception {
+        this.onGameOver = onGameOver;
+        groupe.getChildren().clear();
+        score = 0;
+        top = 0;
+        linesNo = 0;
+        game = true;
+        paused = false;
         for (int[] a : mesh) {
             Arrays.fill(a, 0);
         }
 
-        scene = new Scene(groupe, xMax + 150, yMax);
+        root.getChildren().setAll(groupe);
+        scene = root.getScene();
         System.out.println("BEGINNING THING");
         nextObj = controller.makeShape();
         System.out.println("THING COMPLETED");
@@ -77,9 +82,6 @@ public class Tetris extends Application {
         moveOnKeyPress(a);
         object = a;
         nextObj = controller.makeShape();
-        stage.setScene(scene);
-        stage.setTitle("T E T R I S");
-        stage.show();
 
         Timer fall = new Timer();
         TimerTask task = new TimerTask() {
@@ -88,8 +90,10 @@ public class Tetris extends Application {
                     public void run() {
                         if (paused)
                             return;
-                        if (object.a.getY() == 0 || object.b.getY() == 0 || object.c.getY() == 0
-                                || object.d.getY() == 0)
+                        boolean atTop = object.a.getY() == 0 || object.b.getY() == 0 || object.c.getY() == 0
+                                || object.d.getY() == 0;
+                        // only a genuinely stuck piece (blocked right at spawn) counts toward game over
+                        if (atTop && isBlockedBelow(object))
                             top++;
                         else
                             top = 0;
@@ -104,9 +108,12 @@ public class Tetris extends Application {
                             groupe.getChildren().add(over);
                             game = false;
                         }
-                        // Exit
+                        // return to the main menu after the player has seen the GAME OVER text
                         if (top == 15) {
-                            System.exit(0);
+                            fall.cancel();
+                            if (onGameOver != null) {
+                                onGameOver.run();
+                            }
                         }
 
                         if (game) {
@@ -138,10 +145,12 @@ public class Tetris extends Application {
                         controller.moveRight(form);
                         break;
                     case DOWN:
-                        if (!isBlockedBelow(form)) {
+                        // slam the piece straight down and lock it in immediately
+                        while (!isBlockedBelow(form)) {
                             moveDown(form);
                             score++;
                         }
+                        moveDown(form);
                         break;
                     case LEFT:
                         controller.moveLeft(form);
