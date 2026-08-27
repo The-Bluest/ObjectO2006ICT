@@ -145,11 +145,18 @@ public class Main2 extends Application {
 
         root.getChildren().setAll(mainScreen);
     }
-
-
     private void beginGame() {
 
         try {
+
+            // Update window size according to settings
+            root.getScene().getWindow().setHeight(
+                    settings.getGameHeight() * Tetris.size + 40
+            );
+
+            root.getScene().getWindow().setWidth(
+                    settings.getGameWidth() * Tetris.size + 180
+            );
 
             // Pass Settings into Tetris
             new Tetris(settings).start(
@@ -158,10 +165,25 @@ public class Main2 extends Application {
             );
 
         } catch (Exception e) {
-
             e.printStackTrace();
         }
     }
+
+   // private void beginGame() {
+
+       // try {
+
+            // Pass Settings into Tetris
+           // new Tetris(settings).start(
+          //          root,
+          //          this::showMainScreen
+          //  );
+
+     //   } catch (Exception e) {
+
+     //       e.printStackTrace();
+     //   }
+  //  }
 
 
     private void showConfigScreen() {
@@ -172,10 +194,7 @@ public class Main2 extends Application {
 
         Label label = new Label("Config");
 
-
-        // =========================
         // Game Height
-        // =========================
 
         Label heightLabel =
                 new Label("Game Height");
@@ -207,10 +226,7 @@ public class Main2 extends Application {
                 }
         );
 
-
-        // =========================
         // Game Width
-        // =========================
 
         Label widthLabel =
                 new Label("Game Width");
@@ -242,10 +258,7 @@ public class Main2 extends Application {
                 }
         );
 
-
-        // =========================
         // Game Speed
-        // =========================
 
         Label speedLabel =
                 new Label("Game Speed");
@@ -275,10 +288,7 @@ public class Main2 extends Application {
                 }
         );
 
-
-        // =========================
         // Music
-        // =========================
 
         CheckBox music =
                 new CheckBox("Enable Music?");
@@ -295,10 +305,7 @@ public class Main2 extends Application {
             );
         });
 
-
-        // =========================
         // SFX
-        // =========================
 
         CheckBox sfx =
                 new CheckBox("Enable sfx?");
@@ -315,10 +322,7 @@ public class Main2 extends Application {
             );
         });
 
-
-        // =========================
         // Back button
-        // =========================
 
         Button back =
                 new Button("Return to Menu");
@@ -346,6 +350,8 @@ public class Main2 extends Application {
 
 
     private void showHighScoreScreen() {
+
+        highscores = HighScoreManager.loadScores();
 
         VBox HScreen =
                 new VBox(10);
@@ -401,10 +407,7 @@ public class Main2 extends Application {
 
         root = new StackPane();
 
-
-        // =========================
         // Splash screen
-        // =========================
 
         Stage splashStage =
                 new Stage(
@@ -460,10 +463,7 @@ public class Main2 extends Application {
 
         splashStage.show();
 
-
-        // =========================
         // Loading
-        // =========================
 
         Task<Void> loadTask =
                 new Task<>() {
@@ -495,10 +495,7 @@ public class Main2 extends Application {
 
         new Thread(loadTask).start();
 
-
-        // =========================
         // Main Scene
-        // =========================
 
         Scene scene =
                 new Scene(
