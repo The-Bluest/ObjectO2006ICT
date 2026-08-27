@@ -21,12 +21,16 @@ import java.util.TimerTask;
 
 public class Tetris {
     //variables
-
-    public static final int move = 25; //Settings dependent
-    public static final int size = 25;// settings dependent if movable by 1 value
-    public static int xMax = 250; //settings dependent if deliberately altered
-    public static int yMax = 500;// settings dependent if deliberately altered
-    public static int[][] mesh = new int[xMax / size][yMax / size];
+    public static final int move = 25;
+    public static final int size = 25;
+    public static int xMax;
+    public static int yMax;
+    public static int[][] mesh;
+    //public static final int move = 25; //Settings dependent
+    //public static final int size = 25;// settings dependent if movable by 1 value
+    //public static int xMax = 250; //settings dependent if deliberately altered
+    //public static int yMax = 500;// settings dependent if deliberately altered
+    //public static int[][] mesh = new int[xMax / size][yMax / size];
     private static Pane groupe = new Pane();
     private static form object;
     private static Scene scene;
@@ -38,8 +42,10 @@ public class Tetris {
     private static int linesNo = 0;
     private static Text pausedText;
     private Runnable onGameOver;
-    private static final int fallInterval = 300;
-    private static final int fastFallInterval = 60; // rate while DOWN is held
+    private int fallInterval;
+    private static final int fastFallInterval = 60;
+    //private static final int fallInterval = 300;
+    //private static final int fastFallInterval = 60; // rate while DOWN is held
     private static boolean fastFall = false;
     private settings settings;
     private AudioManager audioManager;
@@ -51,7 +57,13 @@ public class Tetris {
 
     public void start(StackPane root, Runnable onGameOver) throws Exception {
         this.onGameOver = onGameOver;
+        xMax = settings.getGameWidth() * size;
+        yMax = settings.getGameHeight() * size;
+        fallInterval = 600 - (int)(settings.getGameSpeed() * 50);
+        mesh = new int[xMax / size][yMax / size];
 
+        audioManager.setMusicEnabled(settings.isMusicEnabled());
+        audioManager.setSfxEnabled(settings.isSfxEnabled());
         audioManager.setMusicEnabled(settings.isMusicEnabled());
         audioManager.setSfxEnabled(settings.isSfxEnabled());
 
@@ -141,6 +153,9 @@ public class Tetris {
                             over.setY(250);
                             over.setX(10);
                             groupe.getChildren().add(over);
+
+                            HighScoreManager.updateHighScore(score);//high score screen output
+
                             game = false;
                         }
                         // return to the main menu after the player has seen the GAME OVER text
