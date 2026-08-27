@@ -42,63 +42,14 @@ public class Main2 extends Application {
     private void showMainScreen() {
 
         boolean err = false;
-
-        highscores = new ArrayList<Integer>();
-
-        try {
-
-            BufferedReader bf =
-                    new BufferedReader(new FileReader(highFile));
-
-            String line = bf.readLine();
-
-            while (line != null) {
-
-                highscores.add(Integer.parseInt(line));
-
-                line = bf.readLine();
-            }
-
-        } catch (java.io.FileNotFoundException e) {
-
-            System.out.println("File Not Found");
-
-            err = true;
-
-        } catch (java.io.IOException e) {
-
-            System.out.print("IOException");
-
-            err = true;
-        }
-
-
-        if (err) {
-
-            ArrayList<Integer> output =
-                    new ArrayList<Integer>();
-
-            output.add(0);
-            output.add(0);
-            output.add(0);
-            output.add(0);
-            output.add(0);
-
-            try (BufferedWriter writer =
-                         new BufferedWriter(
-                                 new FileWriter("./thing.txt"))) {
-
-                for (Integer out : output) {
-
-                    writer.write(out.toString());
-
-                    writer.newLine();
-                }
-
-            } catch (java.io.IOException e) {
-
-                System.out.println("Error in print???");
-            }
+        highscores = HighScoreManager.loadScores();
+        if (highscores.isEmpty()) {
+            highscores.add(0);
+            highscores.add(0);
+            highscores.add(0);
+            highscores.add(0);
+            highscores.add(0);
+            HighScoreManager.saveScores(highscores);
         }
 
 
