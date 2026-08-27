@@ -17,11 +17,13 @@ public class movej {
     }
 
     public void Right(Rectangle rect) {
+
         if (rect.getX() + move <= xMax - size)
             rect.setX(rect.getX() + move);
     }
 
     public void Left(Rectangle rect) {
+
         if (rect.getX() - move >= 0)
             rect.setX(rect.getX() - move);
     }

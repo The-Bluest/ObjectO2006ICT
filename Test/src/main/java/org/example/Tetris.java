@@ -1,6 +1,5 @@
 package org.example;
 
-import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -20,9 +19,9 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
 public class Tetris {
     //variables
+
     public static final int move = 25; //Settings dependent
     public static final int size = 25;// settings dependent if movable by 1 value
     public static int xMax = 250; //settings dependent if deliberately altered
@@ -42,11 +41,20 @@ public class Tetris {
     private static final int fallInterval = 300;
     private static final int fastFallInterval = 60; // rate while DOWN is held
     private static boolean fastFall = false;
-
+    private settings settings;
+    private AudioManager audioManager;
+    public Tetris(settings settings) {
+        this.settings = settings; //accept settings from Main2
+        this.audioManager = new AudioManager();
+    }
 
 
     public void start(StackPane root, Runnable onGameOver) throws Exception {
         this.onGameOver = onGameOver;
+
+        audioManager.setMusicEnabled(settings.isMusicEnabled());
+        audioManager.setSfxEnabled(settings.isSfxEnabled());
+
         groupe.getChildren().clear();
         score = 0;
         top = 0;
@@ -59,6 +67,12 @@ public class Tetris {
 
         root.getChildren().setAll(groupe);
         scene = root.getScene();
+
+        Platform.runLater(() -> {
+                    groupe.setFocusTraversable(true);
+                    groupe.requestFocus();
+                }); //to solve alt+direction movement
+
         System.out.println("BEGINNING THING");
         nextObj = controller.makeShape();
         System.out.println("THING COMPLETED");
@@ -94,6 +108,7 @@ public class Tetris {
         menuButton.setOnAction(e -> {
             fall.cancel();
             game = false;
+            stopMusic();
             if (onGameOver != null)
                 onGameOver.run();
         });
@@ -147,7 +162,25 @@ public class Tetris {
         };
         fall.schedule(task, 0, tickMs);
     }
-
+    private void stopMusic() {
+        if (audioManager != null) {
+            audioManager.stopMusic();
+        }
+    }
+    private void playMoveSound() {
+        //System.out.println("MOVE SOUND CALLED");
+        //System.out.println("settings = " + settings);
+        //System.out.println("SFX enabled = " + settings.isSfxEnabled());
+        audioManager.playMoveSound();
+        //if (settings != null && settings.isSfxEnabled()) {
+          //  audioManager.playMoveSound();
+        //}
+    }
+    private void playClearSound() {
+        if (settings != null && settings.isSfxEnabled()) {
+            audioManager.playClearSound();
+        }
+    }
 
     private void moveOnKeyPress(form form) { //org.example.controller heavy movement of piece.
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -163,14 +196,20 @@ public class Tetris {
                 switch (event.getCode()) {
                     case RIGHT:
                         controller.moveRight(form);
+                            playMoveSound();
+
                         break;
                     case DOWN:
                         // hold to fall faster instead of slamming straight to the bottom
                         fastFall = true;
+                        playMoveSound();
                         break;
+
                     case LEFT:
                         controller.moveLeft(form);
+                            playMoveSound();
                         break;
+
                     case UP:
                         MoveTurn(form);
                         break;
@@ -495,11 +534,13 @@ public class Tetris {
     private void moveRight(Rectangle rect) {
         if (rect.getX() + move <= xMax - size)
             rect.setX(rect.getX() + move);
+        playMoveSound();
     }
 
     private void moveLeft(Rectangle rect) {
         if (rect.getX() - move >= 0)
             rect.setX(rect.getX() - move);
+        playMoveSound();
     }
 
     private void moveUp(Rectangle rect) {
@@ -537,7 +578,9 @@ public class Tetris {
                 lines.add(i);
             full = 0;
         }
-        if (!lines.isEmpty())
+        if (!lines.isEmpty()){
+            audioManager.playClearSound();
+
             do {
                 for (Node node : pane.getChildren()) {
                     if (node instanceof Rectangle)
@@ -578,7 +621,7 @@ public class Tetris {
                 rects.clear();
             }
             while (!lines.isEmpty());
-    }
+    }}
     private boolean moveA(form form) {
         return (mesh[(int) form.a.getX() / size][((int) form.a.getY() / size) + 1] == 1);
     }

@@ -11,8 +11,11 @@ public class controller {
     public static int yMax = Tetris.yMax;
     public static int[][] mesh = Tetris.mesh;
 
-    public static void moveRight(form form) {
-        if (form.a.getX() + move <= xMax - size && form.b.getX() + move <= xMax - size && form.c.getX() + move <= xMax - size && form.d.getX() + move <= xMax - size) {
+    public static boolean moveRight(form form) {
+        if (form.a.getX() + move <= xMax - size &&
+                form.b.getX() + move <= xMax - size &&
+                form.c.getX() + move <= xMax - size &&
+                form.d.getX() + move <= xMax - size) {
             int movea = mesh[((int) form.a.getX() / size) + 1][((int) form.a.getY() / size)];
             int moveb = mesh[((int) form.b.getX() / size) + 1][((int) form.b.getY() / size)];
             int movec = mesh[((int) form.c.getX() / size) + 1][((int) form.c.getY() / size)];
@@ -22,12 +25,17 @@ public class controller {
                 form.b.setX(form.b.getX() + move);
                 form.c.setX(form.c.getX() + move);
                 form.d.setX(form.d.getX() + move);
+                return true;
             }
         }
+        return false;
     }
 
-    public static void moveLeft(form form) {
-        if (form.a.getX() - move >= 0 && form.b.getX() - move >= 0 && form.c.getX() - move >= 0 && form.d.getX() - move >= 0) {
+    public static boolean moveLeft(form form) {
+        if (form.a.getX() - move >= 0 &&
+                form.b.getX() - move >= 0 &&
+                form.c.getX() - move >= 0 &&
+                form.d.getX() - move >= 0) {
             int movea = mesh[((int) form.a.getX() / size) - 1][((int) form.a.getY() / size)];
             int moveb = mesh[((int) form.b.getX() / size) - 1][((int) form.b.getY() / size)];
             int movec = mesh[((int) form.c.getX() / size) - 1][((int) form.c.getY() / size)];
@@ -37,8 +45,11 @@ public class controller {
                 form.b.setX(form.b.getX() - move);
                 form.c.setX(form.c.getX() - move);
                 form.d.setX(form.d.getX() - move);
+                return true;
             }
         }
+
+        return false;
     }
 
     //actually make the shapes
