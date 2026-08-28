@@ -37,7 +37,7 @@ public class form {
                 color = Color.ORANGE;
                 break;
             case "square":
-                color = Color.YELLOW;
+                color = Color.GOLD;
                 break;
             case "zig":
                 color = Color.GREEN;
