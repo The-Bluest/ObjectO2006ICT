@@ -408,7 +408,7 @@ public class Main2 extends Application {
                         new Image(
                                 getClass()
                                         .getResource(
-                                                "/Wish.png"
+                                                "/Tetis.png"
                                         )
                                         .toExternalForm()
                         )
@@ -427,7 +427,8 @@ public class Main2 extends Application {
         Label loadingLabel =
                 new Label("Group 13 of 2006ICT_3265");
 
-        loadingLabel.setTextFill(Color.WHITE);
+        loadingLabel.setTextFill(Color.BLACK);
+
 
 
         StackPane splashLayout =
