@@ -388,7 +388,7 @@ public class Main2 extends Application {
 
 
         Label loadingLabel =
-                new Label("Take your Time");
+                new Label("Group 13 of 2006ICT_3265");
 
         loadingLabel.setTextFill(Color.WHITE);
 
