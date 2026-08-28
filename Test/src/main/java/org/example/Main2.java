@@ -64,7 +64,7 @@ public class Main2 extends Application {
 
         startButton.setOnAction(e -> beginGame());
 
-        Button splashButton = new Button("Splash Screen");
+        Button splashButton = new Button("Credits");
 
         splashButton.setOnAction(e -> showSplashScreen());
 
@@ -92,9 +92,9 @@ public class Main2 extends Application {
         mainScreen.getChildren().addAll(
                 label,
                 startButton,
-                splashButton,
                 highScoreButton,
                 configButton,
+                splashButton,
                 exitButton
         );
 
