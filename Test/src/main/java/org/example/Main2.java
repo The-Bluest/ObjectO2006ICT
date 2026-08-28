@@ -64,6 +64,9 @@ public class Main2 extends Application {
 
         startButton.setOnAction(e -> beginGame());
 
+        Button splashButton = new Button("Splash Screen");
+
+        splashButton.setOnAction(e -> showSplashScreen());
 
         Button highScoreButton = new Button("High Scores");
 
@@ -89,6 +92,7 @@ public class Main2 extends Application {
         mainScreen.getChildren().addAll(
                 label,
                 startButton,
+                splashButton,
                 highScoreButton,
                 configButton,
                 exitButton
@@ -135,6 +139,39 @@ public class Main2 extends Application {
      //       e.printStackTrace();
      //   }
   //  }
+
+    private void showSplashScreen(){
+        VBox splashScreen = new VBox(10);
+
+        splashScreen.setPadding(new Insets(20));
+
+        Label label = new Label("Group 13 of 2006ICT\n" +
+                "Members: \n" +
+                "s5260128 Anton Navarro-Carneiro git: The-Bluest\n" +
+                "s2990754 Sonny Giosserano git: 1Stunza\n" +
+                "s5327758 Yangzhe Lin git: RoyL919\n" +
+                "s5496712 Weitao Zhang git: ChiyouItou\n" +
+                "s5391319 Dilkash Wadhwani git:Dilkash09\n");
+        VBox sScreen =
+                new VBox(10);
+
+        sScreen.setPadding(
+                new Insets(20)
+        );
+
+        sScreen.getChildren().add(label);
+        Button back =
+                new Button("Return to Menu");
+
+        back.setOnAction(
+                e -> showMainScreen()
+        );
+
+
+        sScreen.getChildren().add(back);
+        root.getChildren().setAll(sScreen);
+
+    }
 
 
     private void showConfigScreen() {
