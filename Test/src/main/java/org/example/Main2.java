@@ -429,7 +429,7 @@ public class Main2 extends Application {
                         new Image(
                                 getClass()
                                         .getResource(
-                                                "/Tetis.png"
+                                                "/Wish.png"
                                         )
                                         .toExternalForm()
                         )
