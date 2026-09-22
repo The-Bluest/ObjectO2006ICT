@@ -7,6 +7,7 @@ public class settings {
     private double gameSpeed;
     private boolean musicEnabled;
     private boolean sfxEnabled;
+    private boolean aiPlay;
 
     public settings() {
         gameHeight = 16;
@@ -14,6 +15,8 @@ public class settings {
         gameSpeed = 5;
         musicEnabled = true;
         sfxEnabled = true;
+        aiPlay= false;
+
     }
 
     public int getGameHeight() {
@@ -55,4 +58,8 @@ public class settings {
     public void setSfxEnabled(boolean sfxEnabled) {
         this.sfxEnabled = sfxEnabled;
     }
+
+    public boolean isAiEnabled(){return aiPlay;}
+
+    public void setAiPlay(boolean aiEnabled){this.aiPlay=aiEnabled;}
 }

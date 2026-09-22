@@ -49,9 +49,11 @@ public class Tetris {
     private static boolean fastFall = false;
     private settings settings;
     private AudioManager audioManager;
+    private AI ai;
     public Tetris(settings settings) {
         this.settings = settings; //accept settings from Main2
         this.audioManager = new AudioManager();
+        this.ai = new AI(new boardeval());
     }
 
 
@@ -111,6 +113,8 @@ public class Tetris {
         groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
         moveOnKeyPress(a);
         object = a;
+        if (settings.isAiEnabled())
+            ai.play(object, mesh);
         nextObj = controller.makeShape();
 
         Timer fall = new Timer();
@@ -207,6 +211,8 @@ public class Tetris {
                     return;
                 }
                 if (paused)
+                    return;
+                if (settings.isAiEnabled())
                     return;
                 switch (event.getCode()) {
                     case RIGHT:
@@ -531,6 +537,8 @@ public class Tetris {
             form a = nextObj;
             nextObj = controller.makeShape();
             object = a;
+            if (settings.isAiEnabled())
+                ai.play(object, mesh);
             groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
             moveOnKeyPress(a);
         } else {
