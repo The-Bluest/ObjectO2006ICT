@@ -14,7 +14,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javafx.version>25</javafx.version>
+        <!-- JavaFX 17 matches the Java 17 language level used by this project. -->
+        <javafx.version>17.0.13</javafx.version>
     </properties>
 
     <dependencies>
@@ -30,6 +31,13 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+
+        <!-- JSON persistence for the leaderboard and game options. -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
         </dependency>
 
     </dependencies>
