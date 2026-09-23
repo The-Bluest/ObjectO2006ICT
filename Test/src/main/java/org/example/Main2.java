@@ -276,6 +276,27 @@ public class Main2 extends Application {
                 }
         );
 
+
+        //game difficulty
+        Label difLabel = new Label("Difficulty");
+        Slider difficulty = new Slider(1,5,settings.getDifficulty());
+        width.setMajorTickUnit(1);
+
+        width.setMinorTickCount(0);
+
+        width.setSnapToTicks(true);
+
+        width.setShowTickMarks(true);
+
+        width.setShowTickLabels(true);
+        difficulty.valueProperty().addListener(
+                ((observable, oldValue, newValue) -> {
+                    settings.setDifficulty(
+                            newValue.intValue()
+                    );
+                })
+        );
+
         // Music
 
         CheckBox music =

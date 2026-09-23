@@ -7,6 +7,7 @@ public class settings {
     private double gameSpeed;
     private boolean musicEnabled;
     private boolean sfxEnabled;
+    private int difficulty;
     private boolean aiPlay;
 
     public settings() {
@@ -15,6 +16,7 @@ public class settings {
         gameSpeed = 5;
         musicEnabled = true;
         sfxEnabled = true;
+        difficulty = 1;
         aiPlay= false;
 
     }
@@ -41,6 +43,13 @@ public class settings {
 
     public void setGameSpeed(double gameSpeed) {
         this.gameSpeed = gameSpeed;
+    }
+
+    public int getDifficulty(){
+        return difficulty;
+    }
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
     }
 
     public boolean isMusicEnabled() {
