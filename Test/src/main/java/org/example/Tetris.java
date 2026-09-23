@@ -47,17 +47,38 @@ public class Tetris {
     //private static final int fallInterval = 300;
     //private static final int fastFallInterval = 60; // rate while DOWN is held
     private static boolean fastFall = false;
+       
+     private final Settings settings;
     private settings settings;
     private AudioManager audioManager;
+    private final HighScoreManager highScoreManager;
+
     private AI ai;
-    public Tetris(settings settings) {
+    public Tetris(settings settings, HighScoreManager highScoreManager) {
+        if (settings == null) {
+            throw new IllegalArgumentException("Settings cannot be null");
+        }
+        if (highScoreManager == null) {
+            throw new IllegalArgumentException(
+                    "High score manager cannot be null");
+        }
+        this(settings, new HighScoreManager());
         this.settings = settings; //accept settings from Main2
         this.audioManager = new AudioManager();
         this.ai = new AI(new boardeval());
+        this.highScoreManager = highScoreManager;
     }
 
 
     public void start(StackPane root, Runnable onGameOver) throws Exception {
+        start(root, "Anonymous", onGameOver);
+    }
+
+    public void start(
+            StackPane root,
+            String playerName,
+            Runnable onGameOver
+    ) throws Exception {
         this.onGameOver = onGameOver;
         xMax = settings.getGameWidth() * size;
         yMax = settings.getGameHeight() * size;
@@ -158,7 +179,7 @@ public class Tetris {
                             over.setX(10);
                             groupe.getChildren().add(over);
 
-                            HighScoreManager.updateHighScore(score);//high score screen output
+                            highScoreManager.updateHighScore(playerName, score);
 
                             game = false;
                         }

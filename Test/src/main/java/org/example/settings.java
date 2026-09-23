@@ -1,6 +1,7 @@
 package org.example;
 
-public class settings {
+
+public class settings extends Settings{
 
     private int gameHeight;
     private int gameWidth;
@@ -11,6 +12,7 @@ public class settings {
     private boolean aiPlay;
 
     public settings() {
+        super();  
         gameHeight = 16;
         gameWidth = 8;
         gameSpeed = 5;
