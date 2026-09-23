@@ -1,67 +1,12 @@
 package org.example;
 
-public class settings {
-
-    private int gameHeight;
-    private int gameWidth;
-    private double gameSpeed;
-    private boolean musicEnabled;
-    private boolean sfxEnabled;
-    private int difficulty;
-
+/**
+ * Backwards-compatible alias for older code that still refers to
+ * {@code settings}. New code should use {@link Settings}.
+ */
+@Deprecated
+public class settings extends Settings {
     public settings() {
-        gameHeight = 16;
-        gameWidth = 8;
-        gameSpeed = 5;
-        musicEnabled = true;
-        sfxEnabled = true;
-        difficulty = 1;
-    }
-
-    public int getGameHeight() {
-        return gameHeight;
-    }
-
-    public void setGameHeight(int gameHeight) {
-        this.gameHeight = gameHeight;
-    }
-
-    public int getGameWidth() {
-        return gameWidth;
-    }
-
-    public void setGameWidth(int gameWidth) {
-        this.gameWidth = gameWidth;
-    }
-
-    public double getGameSpeed() {
-        return gameSpeed;
-    }
-
-    public void setGameSpeed(double gameSpeed) {
-        this.gameSpeed = gameSpeed;
-    }
-
-    public int getDifficulty(){
-        return difficulty;
-    }
-    public void setDifficulty(int difficulty) {
-        this.difficulty = difficulty;
-    }
-
-    public boolean isMusicEnabled() {
-        return musicEnabled;
-    }
-
-    public void setMusicEnabled(boolean musicEnabled) {
-        this.musicEnabled = musicEnabled;
-    }
-
-    public boolean isSfxEnabled() {
-        return sfxEnabled;
-    }
-
-    public void setSfxEnabled(boolean sfxEnabled) {
-        this.sfxEnabled = sfxEnabled;
+        super();
     }
 }
