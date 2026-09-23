@@ -308,6 +308,18 @@ public class Main2 extends Application {
                 gameSettings.isSfxEnabled()
         );
 
+        CheckBox AiPlay =
+                new CheckBox("Enable AI Play?");
+
+        AiPlay.setSelected(
+                settings.isAiEnabled()
+        );
+
+        AiPlay.setOnAction(event->
+                settings.setAiPlay(AiPlay.isSelected())
+        );
+
+
 
         sfx.setOnAction(event -> {
 
@@ -341,6 +353,7 @@ public class Main2 extends Application {
                 difficulty,
                 music,
                 sfx,
+                AiPlay,
                 back
         );
 
@@ -428,7 +441,7 @@ public class Main2 extends Application {
                         new Image(
                                 getClass()
                                         .getResource(
-                                                "/Wish.png"
+                                                "/Wish.png" //cute, please make sure what ever you link actually exists
                                         )
                                         .toExternalForm()
                         )

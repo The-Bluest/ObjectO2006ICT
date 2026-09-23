@@ -47,15 +47,14 @@ public class Tetris {
     //private static final int fallInterval = 300;
     //private static final int fastFallInterval = 60; // rate while DOWN is held
     private static boolean fastFall = false;
-    private final Settings settings;
-    private final AudioManager audioManager;
+       
+     private final Settings settings;
+    private settings settings;
+    private AudioManager audioManager;
     private final HighScoreManager highScoreManager;
 
-    public Tetris(Settings settings) {
-        this(settings, new HighScoreManager());
-    }
-
-    public Tetris(Settings settings, HighScoreManager highScoreManager) {
+    private AI ai;
+    public Tetris(settings settings, HighScoreManager highScoreManager) {
         if (settings == null) {
             throw new IllegalArgumentException("Settings cannot be null");
         }
@@ -63,8 +62,10 @@ public class Tetris {
             throw new IllegalArgumentException(
                     "High score manager cannot be null");
         }
-        this.settings = settings;
+        this(settings, new HighScoreManager());
+        this.settings = settings; //accept settings from Main2
         this.audioManager = new AudioManager();
+        this.ai = new AI(new boardeval());
         this.highScoreManager = highScoreManager;
     }
 
@@ -133,6 +134,8 @@ public class Tetris {
         groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
         moveOnKeyPress(a);
         object = a;
+        if (settings.isAiEnabled())
+            ai.play(object, mesh);
         nextObj = controller.makeShape();
 
         Timer fall = new Timer();
@@ -229,6 +232,8 @@ public class Tetris {
                     return;
                 }
                 if (paused)
+                    return;
+                if (settings.isAiEnabled())
                     return;
                 switch (event.getCode()) {
                     case RIGHT:
@@ -553,6 +558,8 @@ public class Tetris {
             form a = nextObj;
             nextObj = controller.makeShape();
             object = a;
+            if (settings.isAiEnabled())
+                ai.play(object, mesh);
             groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
             moveOnKeyPress(a);
         } else {
