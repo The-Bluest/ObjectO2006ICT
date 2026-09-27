@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -18,8 +17,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.util.List;
-import java.util.Optional;
+import java.io.*;
+import java.util.ArrayList;
 
 public class Main2 extends Application {
 
@@ -27,16 +26,32 @@ public class Main2 extends Application {
         launch(args);
     }
 
+    private ArrayList<Integer> highscores;
+
+    private File highFile = new File("./thing.txt");
+
     private StackPane root;
 
     private final double widthBase = 500;
 
     private double heightBase;
 
-    private final HighScoreManager highScoreManager = new HighScoreManager();
-    private Settings gameSettings;
+    // Settings
+    private settings settings;
 
     private void showMainScreen() {
+
+        boolean err = false;
+        highscores = HighScoreManager.loadScores();
+        if (highscores.isEmpty()) {
+            highscores.add(0);
+            highscores.add(0);
+            highscores.add(0);
+            highscores.add(0);
+            highscores.add(0);
+            HighScoreManager.saveScores(highscores);
+        }
+
 
         VBox mainScreen = new VBox(10);
 
@@ -86,25 +101,21 @@ public class Main2 extends Application {
         root.getChildren().setAll(mainScreen);
     }
     private void beginGame() {
-        Optional<String> playerName = requestPlayerName();
-        if (playerName.isEmpty()) {
-            return;
-        }
 
         try {
 
             // Update window size according to settings
             root.getScene().getWindow().setHeight(
-                    gameSettings.getGameHeight() * Tetris.size + 40
+                    settings.getGameHeight() * Tetris.size + 40
             );
 
             root.getScene().getWindow().setWidth(
-                    gameSettings.getGameWidth() * Tetris.size + 180
+                    settings.getGameWidth() * Tetris.size + 180
             );
 
-            new Tetris(gameSettings, highScoreManager).start(
+            // Pass Settings into Tetris
+            new Tetris(settings).start(
                     root,
-                    playerName.get(),
                     this::showMainScreen
             );
 
@@ -113,17 +124,21 @@ public class Main2 extends Application {
         }
     }
 
-    private Optional<String> requestPlayerName() {
-        TextInputDialog dialog = new TextInputDialog("Player");
-        dialog.setTitle("Start Game");
-        dialog.setHeaderText("Enter your name for the leaderboard");
-        dialog.setContentText("Player name:");
-        dialog.initOwner(root.getScene().getWindow());
+   // private void beginGame() {
 
-        return dialog.showAndWait()
-                .map(String::trim)
-                .filter(name -> !name.isBlank());
-    }
+       // try {
+
+            // Pass Settings into Tetris
+           // new Tetris(settings).start(
+          //          root,
+          //          this::showMainScreen
+          //  );
+
+     //   } catch (Exception e) {
+
+     //       e.printStackTrace();
+     //   }
+  //  }
 
     private void showSplashScreen(){
         VBox splashScreen = new VBox(10);
@@ -176,7 +191,7 @@ public class Main2 extends Application {
                 new Slider(
                         8,
                         24,
-                        gameSettings.getGameHeight()
+                        settings.getGameHeight()
                 );
 
         height.setMajorTickUnit(1);
@@ -193,7 +208,7 @@ public class Main2 extends Application {
         height.valueProperty().addListener(
                 (observable, oldValue, newValue) -> {
 
-                    gameSettings.setGameHeight(
+                    settings.setGameHeight(
                             newValue.intValue()
                     );
                 }
@@ -208,7 +223,7 @@ public class Main2 extends Application {
                 new Slider(
                         4,
                         12,
-                        gameSettings.getGameWidth()
+                        settings.getGameWidth()
                 );
 
         width.setMajorTickUnit(1);
@@ -225,7 +240,7 @@ public class Main2 extends Application {
         width.valueProperty().addListener(
                 (observable, oldValue, newValue) -> {
 
-                    gameSettings.setGameWidth(
+                    settings.setGameWidth(
                             newValue.intValue()
                     );
                 }
@@ -240,7 +255,7 @@ public class Main2 extends Application {
                 new Slider(
                         1,
                         10,
-                        gameSettings.getGameSpeed()
+                        settings.getGameSpeed()
                 );
 
         speed.setMajorTickUnit(1);
@@ -255,7 +270,7 @@ public class Main2 extends Application {
         speed.valueProperty().addListener(
                 (observable, oldValue, newValue) -> {
 
-                    gameSettings.setGameSpeed(
+                    settings.setGameSpeed(
                             newValue.doubleValue()
                     );
                 }
@@ -264,19 +279,19 @@ public class Main2 extends Application {
 
         //game difficulty
         Label difLabel = new Label("Difficulty");
-        Slider difficulty = new Slider(
-                Settings.MIN_DIFFICULTY,
-                Settings.MAX_DIFFICULTY,
-                gameSettings.getDifficulty()
-        );
-        difficulty.setMajorTickUnit(1);
-        difficulty.setMinorTickCount(0);
-        difficulty.setSnapToTicks(true);
-        difficulty.setShowTickMarks(true);
-        difficulty.setShowTickLabels(true);
+        Slider difficulty = new Slider(1,5,settings.getDifficulty());
+        width.setMajorTickUnit(1);
+
+        width.setMinorTickCount(0);
+
+        width.setSnapToTicks(true);
+
+        width.setShowTickMarks(true);
+
+        width.setShowTickLabels(true);
         difficulty.valueProperty().addListener(
                 ((observable, oldValue, newValue) -> {
-                    gameSettings.setDifficulty(
+                    settings.setDifficulty(
                             newValue.intValue()
                     );
                 })
@@ -288,13 +303,13 @@ public class Main2 extends Application {
                 new CheckBox("Enable Music?");
 
         music.setSelected(
-                gameSettings.isMusicEnabled()
+                settings.isMusicEnabled()
         );
 
 
         music.setOnAction(event -> {
 
-            gameSettings.setMusicEnabled(
+            settings.setMusicEnabled(
                     music.isSelected()
             );
         });
@@ -305,7 +320,7 @@ public class Main2 extends Application {
                 new CheckBox("Enable sfx?");
 
         sfx.setSelected(
-                gameSettings.isSfxEnabled()
+                settings.isSfxEnabled()
         );
 
         CheckBox AiPlay =
@@ -323,7 +338,7 @@ public class Main2 extends Application {
 
         sfx.setOnAction(event -> {
 
-            gameSettings.setSfxEnabled(
+            settings.setSfxEnabled(
                     sfx.isSelected()
             );
         });
@@ -331,13 +346,10 @@ public class Main2 extends Application {
         // Back button
 
         Button back =
-                new Button("Save & Return to Menu");
+                new Button("Return to Menu");
 
         back.setOnAction(
-                e -> {
-                    saveSettings();
-                    showMainScreen();
-                }
+                e -> showMainScreen()
         );
 
 
@@ -349,8 +361,6 @@ public class Main2 extends Application {
                 width,
                 speedLabel,
                 speed,
-                difLabel,
-                difficulty,
                 music,
                 sfx,
                 AiPlay,
@@ -360,16 +370,10 @@ public class Main2 extends Application {
         root.getChildren().setAll(configScreen);
     }
 
-    private void saveSettings() {
-        try {
-            gameSettings.save();
-        } catch (IllegalStateException exception) {
-            exception.printStackTrace();
-        }
-    }
 
     private void showHighScoreScreen() {
-        List<HighScoreEntry> highScores = highScoreManager.loadScores();
+
+        highscores = HighScoreManager.loadScores();
 
         VBox HScreen =
                 new VBox(10);
@@ -384,20 +388,17 @@ public class Main2 extends Application {
         HScreen.getChildren().add(label);
 
 
-        if (highScores.isEmpty()) {
-            HScreen.getChildren().add(new Label("No scores yet."));
-        } else {
-            for (int index = 0; index < highScores.size(); index++) {
-                HighScoreEntry entry = highScores.get(index);
-                HScreen.getChildren().add(
-                        new Label(
-                                (index + 1) + ". "
-                                        + entry.getPlayerName()
-                                        + " - "
-                                        + entry.getScore()
-                        )
-                );
-            }
+        int scoreTal = 1;
+
+        for (Integer score : highscores) {
+
+            HScreen.getChildren().add(
+                    new Label(
+                            scoreTal + ":   " + score
+                    )
+            );
+
+            scoreTal += 1;
         }
 
 
@@ -419,11 +420,11 @@ public class Main2 extends Application {
     public void start(Stage primaryStage) {
 
         // Create Settings once
-        gameSettings = Settings.load();
+        settings = new settings();
 
         // Calculate initial window height
         heightBase =
-                gameSettings.getGameHeight() * Tetris.size + 20;
+                settings.getGameHeight() * Tetris.size + 20;
 
 
         root = new StackPane();
