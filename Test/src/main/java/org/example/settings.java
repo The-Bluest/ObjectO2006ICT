@@ -9,6 +9,7 @@ public class settings {
     private boolean sfxEnabled;
     private int difficulty;
     private boolean aiPlay;
+    private boolean externalPlayer;
 
     public settings() {
         gameHeight = 16;
@@ -18,6 +19,7 @@ public class settings {
         sfxEnabled = true;
         difficulty = 1;
         aiPlay= false;
+        externalPlayer = false;
 
     }
 
@@ -71,4 +73,13 @@ public class settings {
     public boolean isAiEnabled(){return aiPlay;}
 
     public void setAiPlay(boolean aiEnabled){this.aiPlay=aiEnabled;}
+
+    public boolean isExternalPlayerEnabled() {
+        return externalPlayer;
+    }
+
+    public void setExternalPlayer(boolean externalPlayer) {
+        this.externalPlayer = externalPlayer;
+    }
+
 }
