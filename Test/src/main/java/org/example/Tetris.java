@@ -48,19 +48,41 @@ public class Tetris {
     //private static final int fallInterval = 300;
     //private static final int fastFallInterval = 60; // rate while DOWN is held
     private static boolean fastFall = false;
-    private settings settings;
-    private AudioManager audioManager;
-    private AI ai;
-    private ExternalPlayer externalPlayer;
-    public Tetris(settings settings) {
-        this.settings = settings; //accept settings from Main2
+    private final Settings settings;
+    private final AudioManager audioManager;
+    private final AI ai;
+    private final ExternalPlayer externalPlayer;
+    private final HighScoreManager highScoreManager;
+
+    public Tetris(Settings settings) {
+        this(settings, new HighScoreManager());
+    }
+
+    public Tetris(Settings settings, HighScoreManager highScoreManager) {
+        if (settings == null) {
+            throw new IllegalArgumentException("Settings cannot be null");
+        }
+        if (highScoreManager == null) {
+            throw new IllegalArgumentException(
+                    "High score manager cannot be null");
+        }
+        this.settings = settings;
         this.audioManager = new AudioManager();
         this.ai = new AI(new boardeval());
         this.externalPlayer = new ExternalPlayer();
+        this.highScoreManager = highScoreManager;
     }
 
 
     public void start(StackPane root, Runnable onGameOver) throws Exception {
+        start(root, "Anonymous", onGameOver);
+    }
+
+    public void start(
+            StackPane root,
+            String playerName,
+            Runnable onGameOver
+    ) throws Exception {
         this.onGameOver = onGameOver;
         xMax = settings.getGameWidth() * size;
         yMax = settings.getGameHeight() * size;
@@ -171,7 +193,7 @@ public class Tetris {
                             over.setX(10);
                             groupe.getChildren().add(over);
 
-                            HighScoreManager.updateHighScore(score);//high score screen output
+                            highScoreManager.updateHighScore(playerName, score);
 
                             game = false;
                         }
