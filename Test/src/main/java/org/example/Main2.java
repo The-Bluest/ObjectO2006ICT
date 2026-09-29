@@ -323,6 +323,7 @@ public class Main2 extends Application {
                 settings.isSfxEnabled()
         );
 
+        // AI Play
         CheckBox AiPlay =
                 new CheckBox("Enable AI Play?");
 
@@ -330,11 +331,43 @@ public class Main2 extends Application {
                 settings.isAiEnabled()
         );
 
-        AiPlay.setOnAction(event->
-                settings.setAiPlay(AiPlay.isSelected())
+        // External Player
+        CheckBox externalPlay =
+                new CheckBox("Enable External Player?");
+
+        externalPlay.setSelected(
+                settings.isExternalPlayerEnabled()
         );
 
+        // AI checkbox action
+        AiPlay.setOnAction(event -> {
 
+            settings.setAiPlay(
+                    AiPlay.isSelected()
+            );
+
+            if (AiPlay.isSelected()) {
+
+                externalPlay.setSelected(false);
+
+                settings.setExternalPlayer(false);
+            }
+        });
+
+        // External Player checkbox action
+        externalPlay.setOnAction(event -> {
+
+            settings.setExternalPlayer(
+                    externalPlay.isSelected()
+            );
+
+            if (externalPlay.isSelected()) {
+
+                AiPlay.setSelected(false);
+
+                settings.setAiPlay(false);
+            }
+        });
 
         sfx.setOnAction(event -> {
 
@@ -364,6 +397,7 @@ public class Main2 extends Application {
                 music,
                 sfx,
                 AiPlay,
+                externalPlay,
                 back
         );
 

@@ -41,6 +41,7 @@ public class Tetris {
     private static form nextObj;
     private static int linesNo = 0;
     private static Text pausedText;
+    private static Text externalWarningText;
     private Runnable onGameOver;
     private int fallInterval;
     private static final int fastFallInterval = 60;
@@ -50,10 +51,12 @@ public class Tetris {
     private settings settings;
     private AudioManager audioManager;
     private AI ai;
+    private ExternalPlayer externalPlayer;
     public Tetris(settings settings) {
         this.settings = settings; //accept settings from Main2
         this.audioManager = new AudioManager();
         this.ai = new AI(new boardeval());
+        this.externalPlayer = new ExternalPlayer();
     }
 
 
@@ -107,7 +110,13 @@ public class Tetris {
         pausedText.setY(250);
         pausedText.setX(10);
         pausedText.setVisible(false);
-        groupe.getChildren().addAll(scoretext, line, level, pausedText);
+        externalWarningText = new Text("External Player server unavailable");
+        externalWarningText.setFill(Color.RED);
+        externalWarningText.setStyle("-fx-font: 18 arial; -fx-font-weight: bold;");
+        externalWarningText.setX((xMax - externalWarningText.getLayoutBounds().getWidth()) / 2);
+        externalWarningText.setY(yMax / 2.0);
+        externalWarningText.setVisible(false);
+        groupe.getChildren().addAll(scoretext, line, level, pausedText, externalWarningText);
 
         form a = nextObj;
         groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
@@ -116,6 +125,10 @@ public class Tetris {
         if (settings.isAiEnabled())
             ai.play(object, mesh);
         nextObj = controller.makeShape();
+
+        if (settings.isExternalPlayerEnabled()) {
+            requestExternalMove();
+        }
 
         Timer fall = new Timer();
         Button menuButton = new Button("Back to Menu");
@@ -181,6 +194,181 @@ public class Tetris {
         };
         fall.schedule(task, 0, tickMs);
     }
+
+    private PureGame createPureGame() {
+
+        int width = xMax / size;
+        int height = yMax / size;
+
+        int[][] cells = new int[height][width];
+
+        // Convert mesh[x][y] into cells[y][x]
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                cells[y][x] = mesh[x][y];
+            }
+        }
+
+        int[][] currentShape = shapeToArray(object);
+        int[][] nextShape = shapeToArray(nextObj);
+
+        return new PureGame(
+                width,
+                height,
+                cells,
+                currentShape,
+                nextShape
+        );
+    }
+
+    private int[][] shapeToArray(form piece) {
+
+        Rectangle[] blocks = {
+                piece.a,
+                piece.b,
+                piece.c,
+                piece.d
+        };
+
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+
+        for (Rectangle block : blocks) {
+
+            int x = (int) block.getX() / size;
+            int y = (int) block.getY() / size;
+
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+        }
+
+        int[][] shape =
+                new int[maxY - minY + 1][maxX - minX + 1];
+
+        for (Rectangle block : blocks) {
+
+            int x = (int) block.getX() / size - minX;
+            int y = (int) block.getY() / size - minY;
+
+            shape[y][x] = 1;
+        }
+
+        return shape;
+    }
+
+    private void requestExternalMove() {
+
+        PureGame gameState = createPureGame();
+
+        OpMove move = externalPlayer.requestMove(gameState);
+
+        if (move == null) {
+
+            System.out.println(
+                    "External Player unavailable - piece will continue without external control."
+            );
+
+            showExternalWarning();
+
+            return;
+        }
+
+        hideExternalWarning();
+
+        System.out.println(
+                "External move: X = " + move.opX()
+                        + ", rotations = " + move.opRotate()
+        );
+
+        applyExternalMove(move);
+    }
+
+    private void applyExternalMove(OpMove move) {
+
+        if (move == null) {
+            return;
+        }
+
+        // Rotate the current piece
+        for (int i = 0; i < move.opRotate(); i++) {
+            MoveTurn(object);
+        }
+
+        // Find the current left-most X position
+        int currentX = getPieceLeftX(object);
+
+        // Move toward the server's target X position
+        while (currentX < move.opX()) {
+
+            int before = getPieceLeftX(object);
+
+            controller.moveRight(object);
+
+            int after = getPieceLeftX(object);
+
+            // Movement failed, so stop to avoid an infinite loop
+            if (before == after) {
+                break;
+            }
+
+            currentX = after;
+        }
+
+        while (currentX > move.opX()) {
+
+            int before = getPieceLeftX(object);
+
+            controller.moveLeft(object);
+
+            int after = getPieceLeftX(object);
+
+            if (before == after) {
+                break;
+            }
+
+            currentX = after;
+        }
+
+        System.out.println(
+                "External player applied: target X = "
+                        + move.opX()
+                        + ", rotations = "
+                        + move.opRotate()
+        );
+    }
+
+    private void showExternalWarning() {
+
+        if (externalWarningText != null) {
+            externalWarningText.setVisible(true);
+            externalWarningText.toFront();
+        }
+    }
+
+    private void hideExternalWarning() {
+
+        if (externalWarningText != null) {
+            externalWarningText.setVisible(false);
+        }
+    }
+
+    private int getPieceLeftX(form piece) {
+
+        int aX = (int) piece.a.getX() / size;
+        int bX = (int) piece.b.getX() / size;
+        int cX = (int) piece.c.getX() / size;
+        int dX = (int) piece.d.getX() / size;
+
+        return Math.min(
+                Math.min(aX, bX),
+                Math.min(cX, dX)
+        );
+    }
+
     private void stopMusic() {
         if (audioManager != null) {
             audioManager.stopMusic();
@@ -205,6 +393,13 @@ public class Tetris {
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
+
+//                System.out.println(
+//                        "KEY PRESSED: " + event.getCode()
+//                                + " | AI = " + settings.isAiEnabled()
+//                                + " | External = " + settings.isExternalPlayerEnabled()
+//                );
+
                 if (event.getCode() == KeyCode.P) {
                     paused = !paused;
                     pausedText.setVisible(paused);
@@ -212,7 +407,7 @@ public class Tetris {
                 }
                 if (paused)
                     return;
-                if (settings.isAiEnabled())
+                if (settings.isAiEnabled() || settings.isExternalPlayerEnabled())
                     return;
                 switch (event.getCode()) {
                     case RIGHT:
@@ -539,6 +734,16 @@ public class Tetris {
             object = a;
             if (settings.isAiEnabled())
                 ai.play(object, mesh);
+
+            if (settings.isExternalPlayerEnabled()) {
+
+//                System.out.println(
+//                        "NEW PIECE CREATED - asking external player"
+//                );
+
+                requestExternalMove();
+            }
+
             groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
             moveOnKeyPress(a);
         } else {
