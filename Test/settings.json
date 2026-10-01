@@ -5,6 +5,5 @@
   "musicEnabled": true,
   "sfxEnabled": true,
   "difficulty": 1,
-  "aiPlay": false,
-  "externalPlayer": false
+  "playerMode": "HUMAN"
 }

@@ -36,8 +36,7 @@ public class Settings {
     private boolean musicEnabled = true;
     private boolean sfxEnabled = true;
     private int difficulty = 1;
-    private boolean aiPlay;
-    private boolean externalPlayer;
+    private PlayerType playerMode = PlayerType.HUMAN;
 
     private transient Path file = DEFAULT_FILE;
 
@@ -171,19 +170,19 @@ public class Settings {
     }
 
     public boolean isAiEnabled() {
-        return aiPlay;
-    }
-
-    public void setAiPlay(boolean aiPlay) {
-        this.aiPlay = aiPlay;
+        return playerMode == PlayerType.AI;
     }
 
     public boolean isExternalPlayerEnabled() {
-        return externalPlayer;
+        return playerMode == PlayerType.EXTERNAL;
     }
 
-    public void setExternalPlayer(boolean externalPlayer) {
-        this.externalPlayer = externalPlayer;
+    public PlayerType getPlayerMode() {
+        return playerMode;
+    }
+
+    public void setPlayerMode(PlayerType playerMode) {
+        this.playerMode = playerMode == null ? PlayerType.HUMAN : playerMode;
     }
 
     private void normalise() {
@@ -195,6 +194,9 @@ public class Settings {
             gameSpeed = Math.max(MIN_SPEED, Math.min(MAX_SPEED, gameSpeed));
         }
         difficulty = clamp(difficulty, MIN_DIFFICULTY, MAX_DIFFICULTY);
+        if (playerMode == null) {
+            playerMode = PlayerType.HUMAN;
+        }
     }
 
     private static int clamp(int value, int minimum, int maximum) {
