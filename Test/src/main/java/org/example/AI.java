@@ -40,6 +40,11 @@ public class AI {
         }
     }
 
+    // exposes the rotation-state cell tables so human rotation (PlayerBoard) can reuse them
+    static int[][][] shapeStates(String name) {
+        return SHAPES.get(name);
+    }
+
     private static int[][] rotateCW(int[][] cells) {
         int[][] rotated = new int[cells.length][2];
         for (int i = 0; i < cells.length; i++) {

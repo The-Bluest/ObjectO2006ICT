@@ -4,6 +4,16 @@ package org.example;
 import java.util.ArrayList;
 
 public class boardeval {
+    // stateless evaluator: one shared instance is enough for the whole app
+    private static final boardeval INSTANCE = new boardeval();
+
+    private boardeval() {
+    }
+
+    public static boardeval getInstance() {
+        return INSTANCE;
+    }
+
     public int columnHeight(int[][] board, int col){ //board is column-major: board[col][row], row 0 is the top
         int rows = board[0].length;
         for (int row = 0; row<rows; row++){
