@@ -410,11 +410,10 @@ public class Main2 extends Application {
         externalMode.setToggleGroup(playerModeGroup);
         externalMode.setUserData(PlayerType.EXTERNAL);
 
-        for (javafx.scene.control.Toggle toggle : playerModeGroup.getToggles()) {
-            if (toggle.getUserData() == settings.getPlayerMode()) {
-                playerModeGroup.selectToggle(toggle);
-            }
-        }
+        playerModeGroup.getToggles().stream()
+                .filter(toggle -> toggle.getUserData() == settings.getPlayerMode())
+                .findFirst()
+                .ifPresent(playerModeGroup::selectToggle);
 
         playerModeGroup.selectedToggleProperty().addListener(
                 (observable, oldValue, newValue) -> {

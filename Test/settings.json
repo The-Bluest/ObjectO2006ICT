@@ -1,6 +1,6 @@
 {
-  "gameHeight": 16,
-  "gameWidth": 8,
+  "gameHeight": 21,
+  "gameWidth": 11,
   "gameSpeed": 5.0,
   "musicEnabled": true,
   "sfxEnabled": true,

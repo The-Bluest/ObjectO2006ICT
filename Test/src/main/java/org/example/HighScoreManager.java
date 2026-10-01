@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Loads and persists the ten highest scores as JSON.
@@ -118,18 +120,11 @@ public class HighScoreManager {
 
     private List<HighScoreEntry> loadLegacyScoresIfPresent() {
         if (file.equals(DEFAULT_FILE) && Files.exists(LEGACY_FILE)) {
-            List<HighScoreEntry> migratedScores = new ArrayList<>();
             try (BufferedReader reader = Files.newBufferedReader(LEGACY_FILE)) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    try {
-                        migratedScores.add(
-                                new HighScoreEntry("Anonymous", Integer.parseInt(line.trim()))
-                        );
-                    } catch (IllegalArgumentException ignored) {
-                        // Ignore malformed legacy rows rather than breaking the menu.
-                    }
-                }
+                List<HighScoreEntry> migratedScores = reader.lines()
+                        .map(line -> parseLegacyScore(line.trim()))
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
                 return prepareForStorage(migratedScores);
             } catch (IOException exception) {
                 System.err.println("Could not load legacy high scores from "
@@ -139,31 +134,37 @@ public class HighScoreManager {
         return List.of();
     }
 
+    private static HighScoreEntry parseLegacyScore(String line) {
+        try {
+            return new HighScoreEntry("Anonymous", Integer.parseInt(line));
+        } catch (IllegalArgumentException ignored) {
+            // Ignore malformed legacy rows rather than breaking the menu.
+            return null;
+        }
+    }
+
     private static List<HighScoreEntry> prepareForStorage(
             Collection<HighScoreEntry> scores) {
         if (scores == null) {
             throw new IllegalArgumentException("Scores cannot be null");
         }
 
-        List<HighScoreEntry> sortedScores = new ArrayList<>();
-        for (HighScoreEntry score : scores) {
-            if (score != null) {
-                try {
-                    sortedScores.add(new HighScoreEntry(
-                            score.getPlayerName(),
-                            score.getScore()
-                    ));
-                } catch (IllegalArgumentException ignored) {
-                    // Ignore invalid rows loaded from a manually edited JSON file.
-                }
-            }
-        }
+        return scores.stream()
+                .filter(Objects::nonNull)
+                .map(HighScoreManager::resanitise)
+                .filter(Objects::nonNull)
+                .sorted(LEADERBOARD_ORDER)
+                .limit(MAX_SCORES)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
 
-        sortedScores.sort(LEADERBOARD_ORDER);
-        if (sortedScores.size() > MAX_SCORES) {
-            return new ArrayList<>(sortedScores.subList(0, MAX_SCORES));
+    private static HighScoreEntry resanitise(HighScoreEntry score) {
+        try {
+            return new HighScoreEntry(score.getPlayerName(), score.getScore());
+        } catch (IllegalArgumentException ignored) {
+            // Ignore invalid rows loaded from a manually edited JSON file.
+            return null;
         }
-        return sortedScores;
     }
 
     private static void moveIntoPlace(Path temporaryFile, Path targetFile)
