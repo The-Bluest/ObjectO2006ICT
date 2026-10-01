@@ -42,6 +42,8 @@ public class Tetris {
     private static int linesNo = 0;
     private static Text pausedText;
     private static Text externalWarningText;
+    private static Text musicStatusText;
+    private static Text sfxStatusText;
     private Runnable onGameOver;
     private int fallInterval;
     private static final int fastFallInterval = 60;
@@ -68,7 +70,7 @@ public class Tetris {
         }
         this.settings = settings;
         this.audioManager = new AudioManager();
-        this.ai = new AI(new boardeval());
+        this.ai = new AI(boardeval.getInstance());
         this.externalPlayer = new ExternalPlayer();
         this.highScoreManager = highScoreManager;
     }
@@ -89,8 +91,6 @@ public class Tetris {
         fallInterval = 600 - (int)(settings.getGameSpeed() * 50);
         mesh = new int[xMax / size][yMax / size];
 
-        audioManager.setMusicEnabled(settings.isMusicEnabled());
-        audioManager.setSfxEnabled(settings.isSfxEnabled());
         audioManager.setMusicEnabled(settings.isMusicEnabled());
         audioManager.setSfxEnabled(settings.isSfxEnabled());
 
@@ -126,6 +126,20 @@ public class Tetris {
         level.setY(100);
         level.setX(xMax + 5);
         level.setFill(Color.GREEN);
+        musicStatusText = new Text(
+                "Music: " + (settings.isMusicEnabled() ? "ON" : "OFF")
+        );
+        musicStatusText.setStyle("-fx-font: 16 arial;");
+        musicStatusText.setX(xMax + 5);
+        musicStatusText.setY(125);
+
+        sfxStatusText = new Text(
+                "Sound: " + (settings.isSfxEnabled() ? "ON" : "OFF")
+        );
+        sfxStatusText.setStyle("-fx-font: 16 arial;");
+        sfxStatusText.setX(xMax + 5);
+        sfxStatusText.setY(150);
+
         pausedText = new Text("PAUSED");
         pausedText.setFill(Color.RED);
         pausedText.setStyle("-fx-font: 40 arial;");
@@ -138,7 +152,8 @@ public class Tetris {
         externalWarningText.setX((xMax - externalWarningText.getLayoutBounds().getWidth()) / 2);
         externalWarningText.setY(yMax / 2.0);
         externalWarningText.setVisible(false);
-        groupe.getChildren().addAll(scoretext, line, level, pausedText, externalWarningText);
+        groupe.getChildren().addAll(scoretext, line, level, musicStatusText,
+                sfxStatusText, pausedText, externalWarningText);
 
         form a = nextObj;
         groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
@@ -155,7 +170,7 @@ public class Tetris {
         Timer fall = new Timer();
         Button menuButton = new Button("Back to Menu");
         menuButton.setLayoutX(xMax + 5);
-        menuButton.setLayoutY(150);
+        menuButton.setLayoutY(190);
         menuButton.setOnAction(e -> {
             fall.cancel();
             game = false;
@@ -427,6 +442,31 @@ public class Tetris {
                     pausedText.setVisible(paused);
                     return;
                 }
+
+                if (event.getCode() == KeyCode.M) {
+                    boolean newMusicState = !settings.isMusicEnabled();
+
+                    settings.setMusicEnabled(newMusicState);
+                    audioManager.setMusicEnabled(newMusicState);
+
+                    musicStatusText.setText(
+                            "Music: " + (newMusicState ? "ON" : "OFF")
+                    );
+                    return;
+                }
+
+                if (event.getCode() == KeyCode.S) {
+                    boolean newSfxState = !settings.isSfxEnabled();
+
+                    settings.setSfxEnabled(newSfxState);
+                    audioManager.setSfxEnabled(newSfxState);
+
+                    sfxStatusText.setText(
+                            "Sound: " + (newSfxState ? "ON" : "OFF")
+                    );
+                    return;
+                }
+
                 if (paused)
                     return;
                 if (settings.isAiEnabled() || settings.isExternalPlayerEnabled())

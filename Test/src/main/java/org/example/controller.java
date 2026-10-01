@@ -7,11 +7,10 @@ public class controller {
     // get from org.example.tetris for control
     public static final int move = Tetris.move;
     public static final int size = Tetris.size;
-    public static int xMax = Tetris.xMax;
-    public static int yMax = Tetris.yMax;
-    public static int[][] mesh = Tetris.mesh;
 
     public static boolean moveRight(form form) {
+        int xMax = Tetris.xMax;
+        int[][] mesh = Tetris.mesh;
         if (form.a.getX() + move <= xMax - size &&
                 form.b.getX() + move <= xMax - size &&
                 form.c.getX() + move <= xMax - size &&
@@ -32,6 +31,8 @@ public class controller {
     }
 
     public static boolean moveLeft(form form) {
+        int xMax = Tetris.xMax;
+        int[][] mesh = Tetris.mesh;
         if (form.a.getX() - move >= 0 &&
                 form.b.getX() - move >= 0 &&
                 form.c.getX() - move >= 0 &&
@@ -52,9 +53,72 @@ public class controller {
         return false;
     }
 
+    // for two-player mode tetris
+    public static form makeShape(String name, int boardXMax) {
+        Rectangle a = new Rectangle(size - 1, size - 1);
+        Rectangle b = new Rectangle(size - 1, size - 1);
+        Rectangle c = new Rectangle(size - 1, size - 1);
+        Rectangle d = new Rectangle(size - 1, size - 1);
+        if (name.equals("l")) {
+            a.setX(boardXMax / 2 - size);
+            b.setX(boardXMax / 2 - size);
+            b.setY(size);
+            c.setX(boardXMax / 2);
+            c.setY(size);
+            d.setX(boardXMax / 2 + size);
+            d.setY(size);
+        } else if (name.equals("ll")) {
+            a.setX(boardXMax / 2 + size);
+            b.setX(boardXMax / 2 - size);
+            b.setY(size);
+            c.setX(boardXMax / 2);
+            c.setY(size);
+            d.setX(boardXMax / 2 + size);
+            d.setY(size);
+        } else if (name.equals("square")) {
+            a.setX(boardXMax / 2 - size);
+            b.setX(boardXMax / 2);
+            c.setX(boardXMax / 2 - size);
+            c.setY(size);
+            d.setX(boardXMax / 2);
+            d.setY(size);
+        } else if (name.equals("s")) {
+            a.setX(boardXMax / 2 + size);
+            b.setX(boardXMax / 2);
+            c.setX(boardXMax / 2);
+            c.setY(size);
+            d.setX(boardXMax / 2 - size);
+            d.setY(size);
+        } else if (name.equals("zig")) {
+            a.setX(boardXMax / 2 + size);
+            b.setX(boardXMax / 2);
+            c.setX(boardXMax / 2 + size);
+            c.setY(size);
+            d.setX(boardXMax / 2 + size + size);
+            d.setY(size);
+        } else if (name.equals("t")) {
+            a.setX(boardXMax / 2 - size);
+            b.setX(boardXMax / 2);
+            c.setX(boardXMax / 2);
+            c.setY(size);
+            d.setX(boardXMax / 2 + size);
+        } else if (name.equals("line")) {
+            a.setX(boardXMax / 2 - size - size);
+            b.setX(boardXMax / 2 - size);
+            c.setX(boardXMax / 2);
+            d.setX(boardXMax / 2 + size);
+        } else {
+            throw new IllegalArgumentException(
+                    "Unknown tetromino type: " + name
+            );
+        }
+
+        return new form(a, b, c, d, name);
+    }
     //actually make the shapes
     //basicilly manually built each blocks instructions, then run for random to decide which one it makes 
     public static form makeShape() {
+        int xMax = Tetris.xMax;
         int block = (int) (Math.random() * 100); //what even is random
         String name;
         Rectangle a = new Rectangle(size - 1, size - 1), b = new Rectangle(size - 1, size - 1), c = new Rectangle(size - 1, size - 1), d = new Rectangle(size - 1, size - 1);

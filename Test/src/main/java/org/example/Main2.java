@@ -35,58 +35,139 @@ public class Main2 extends Application {
 
     private final HighScoreManager highScoreManager = new HighScoreManager();
 
-    // Settings
     private Settings settings;
-
     private void showMainScreen() {
-
         VBox mainScreen = new VBox(10);
-
         mainScreen.setPadding(new Insets(20));
-
         Label label = new Label("Main Screen");
-
-
         Button startButton = new Button("Start Game");
-
         startButton.setOnAction(e -> beginGame());
-
+        Button twoPlayerButton =
+                new Button("Two Player Mode");
+        twoPlayerButton.setOnAction(
+                e -> showTwoPlayerMenu()
+        );
         Button splashButton = new Button("Credits");
-
         splashButton.setOnAction(e -> showSplashScreen());
-
         Button highScoreButton = new Button("High Scores");
-
         highScoreButton.setOnAction(
                 e -> showHighScoreScreen()
         );
-
-
         Button configButton = new Button("Configuration");
 
         configButton.setOnAction(
                 e -> showConfigScreen()
         );
-
-
         Button exitButton = new Button("Exit");
 
         exitButton.setOnAction(e -> {
             System.exit(0);
         });
 
-
         mainScreen.getChildren().addAll(
                 label,
                 startButton,
+                twoPlayerButton,
                 highScoreButton,
                 configButton,
                 splashButton,
                 exitButton
         );
-
         root.getChildren().setAll(mainScreen);
     }
+
+    private void showTwoPlayerMenu() {
+        VBox menu =
+                new VBox(15);
+        menu.setPadding(
+                new Insets(20)
+        );
+        Label title =
+                new Label(
+                        "Two Player Mode"
+                );
+        title.setStyle(
+                "-fx-font-size: 24px;" +
+                        "-fx-font-weight: bold;"
+        );
+        Button humanVsAI =
+                new Button(
+                        "Human vs AI"
+                );
+        humanVsAI.setOnAction(event -> {
+            startTwoPlayerGame(
+                    PlayerType.HUMAN,
+                    PlayerType.AI
+            );
+        });
+        Button aiVsAI =
+                new Button(
+                        "AI vs AI"
+                );
+        aiVsAI.setOnAction(event -> {
+            startTwoPlayerGame(
+                    PlayerType.AI,
+                    PlayerType.AI
+            );
+        });
+        Button humanVsHuman =
+                new Button(
+                        "Human vs Human"
+                );
+        humanVsHuman.setOnAction(event -> {
+            startTwoPlayerGame(
+                    PlayerType.HUMAN,
+                    PlayerType.HUMAN
+            );
+        });
+        Button humanVsExternal =
+                new Button(
+                        "Human vs External Server"
+                );
+        humanVsExternal.setOnAction(event -> {
+            startTwoPlayerGame(
+                    PlayerType.HUMAN,
+                    PlayerType.EXTERNAL
+            );
+        });
+        Button back =
+                new Button(
+                        "Back to Main Menu"
+                );
+        back.setOnAction(
+                event -> showMainScreen()
+        );
+        menu.getChildren().addAll(
+                title,
+                humanVsAI,
+                aiVsAI,
+                humanVsHuman,
+                humanVsExternal,
+                back
+        );
+        root.getChildren().setAll(
+                menu
+        );
+    }
+
+    private void startTwoPlayerGame(
+            PlayerType player1Type,
+            PlayerType player2Type
+    ) {
+        try {
+            TwoPlayerGame twoPlayerGame =
+                    new TwoPlayerGame(settings);
+            twoPlayerGame.start(
+                    root,
+                    player1Type,
+                    player2Type,
+                    this::showMainScreen
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void beginGame() {
         Optional<String> playerName = requestPlayerName();
         if (playerName.isEmpty()) {
