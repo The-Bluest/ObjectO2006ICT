@@ -26,11 +26,6 @@ public class Tetris {
     public static int xMax;
     public static int yMax;
     public static int[][] mesh;
-    //public static final int move = 25; //Settings dependent
-    //public static final int size = 25;// settings dependent if movable by 1 value
-    //public static int xMax = 250; //settings dependent if deliberately altered
-    //public static int yMax = 500;// settings dependent if deliberately altered
-    //public static int[][] mesh = new int[xMax / size][yMax / size];
     private static Pane groupe = new Pane();
     private static form object;
     private static Scene scene;
@@ -44,11 +39,10 @@ public class Tetris {
     private static Text externalWarningText;
     private static Text musicStatusText;
     private static Text sfxStatusText;
+    private static Text difficultyText; // add
     private Runnable onGameOver;
     private int fallInterval;
     private static final int fastFallInterval = 60;
-    //private static final int fallInterval = 300;
-    //private static final int fastFallInterval = 60; // rate while DOWN is held
     private static boolean fastFall = false;
     private final Settings settings;
     private final AudioManager audioManager;
@@ -110,7 +104,7 @@ public class Tetris {
         Platform.runLater(() -> {
                     groupe.setFocusTraversable(true);
                     groupe.requestFocus();
-                }); //to solve alt+direction movement
+                });
 
         System.out.println("BEGINNING THING");
         nextObj = controller.makeShape();
@@ -140,6 +134,15 @@ public class Tetris {
         sfxStatusText.setX(xMax + 5);
         sfxStatusText.setY(150);
 
+        // add: difficulty label on the board
+        difficultyText = new Text(
+                "Difficulty: " + settings.getDifficulty()
+        );
+        difficultyText.setStyle("-fx-font: 16 arial; -fx-font-weight: bold;");
+        difficultyText.setX(xMax + 5);
+        difficultyText.setY(175);
+        difficultyText.setFill(Color.DARKBLUE);
+
         pausedText = new Text("PAUSED");
         pausedText.setFill(Color.RED);
         pausedText.setStyle("-fx-font: 40 arial;");
@@ -153,7 +156,7 @@ public class Tetris {
         externalWarningText.setY(yMax / 2.0);
         externalWarningText.setVisible(false);
         groupe.getChildren().addAll(scoretext, line, level, musicStatusText,
-                sfxStatusText, pausedText, externalWarningText);
+                sfxStatusText, difficultyText, pausedText, externalWarningText);
 
         form a = nextObj;
         groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
@@ -170,7 +173,8 @@ public class Tetris {
         Timer fall = new Timer();
         Button menuButton = new Button("Back to Menu");
         menuButton.setLayoutX(xMax + 5);
-        menuButton.setLayoutY(190);
+        // CHANGED: shifted down to make room for the difficulty label
+        menuButton.setLayoutY(220);
         menuButton.setOnAction(e -> {
             fall.cancel();
             game = false;
@@ -193,14 +197,12 @@ public class Tetris {
                         elapsed[0] = 0;
                         boolean atTop = object.a.getY() == 0 || object.b.getY() == 0 || object.c.getY() == 0
                                 || object.d.getY() == 0;
-                        // only a genuinely stuck piece (blocked right at spawn) counts toward game over
                         if (atTop && isBlockedBelow(object))
                             top++;
                         else
                             top = 0;
 
                         if (top == 2) {
-                            // GAME OVER
                             Text over = new Text("GAME OVER");
                             over.setFill(Color.RED);
                             over.setStyle("-fx-font: 70 arial;");
@@ -212,7 +214,6 @@ public class Tetris {
 
                             game = false;
                         }
-                        // return to the main menu after the player has seen the GAME OVER text
                         if (top == 15) {
                             fall.cancel();
                             if (onGameOver != null) {
