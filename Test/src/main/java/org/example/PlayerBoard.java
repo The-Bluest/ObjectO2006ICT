@@ -19,6 +19,7 @@ public class PlayerBoard {
     private final Label scoreLabel;
     private final Label linesLabel;
     private final Label pieceLabel;
+    private final Label difficultyLabel; // add
     private final PlayerType playerType;
     private final SharedPieceSequence sharedSequence;
     private final AI ai;
@@ -73,9 +74,20 @@ public class PlayerBoard {
         scoreLabel = new Label("Score: 0");
         linesLabel = new Label("Lines: 0");
         pieceLabel = new Label("Piece: -");
+        // add: difficulty label for the board
+        difficultyLabel = new Label(
+                "Difficulty: " + settings.getDifficulty()
+        );
+        difficultyLabel.setStyle(
+                "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-text-fill: darkblue;"
+        );
         view = new VBox(
                 5,
                 playerLabel,
+                // add: difficulty shown under the player name
+                difficultyLabel,
                 scoreLabel,
                 linesLabel,
                 pieceLabel,
