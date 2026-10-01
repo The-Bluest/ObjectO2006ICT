@@ -1,0 +1,10 @@
+{
+  "gameHeight": 16,
+  "gameWidth": 8,
+  "gameSpeed": 5.0,
+  "musicEnabled": true,
+  "sfxEnabled": true,
+  "difficulty": 1,
+  "aiPlay": false,
+  "externalPlayer": false
+}
