@@ -68,7 +68,7 @@ public class Tetris {
         }
         this.settings = settings;
         this.audioManager = new AudioManager();
-        this.ai = new AI(new boardeval());
+        this.ai = new AI(boardeval.getInstance());
         this.externalPlayer = new ExternalPlayer();
         this.highScoreManager = highScoreManager;
     }

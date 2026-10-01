@@ -120,6 +120,16 @@ public class Main2 extends Application {
                     PlayerType.HUMAN
             );
         });
+        Button humanVsExternal =
+                new Button(
+                        "Human vs External Server"
+                );
+        humanVsExternal.setOnAction(event -> {
+            startTwoPlayerGame(
+                    PlayerType.HUMAN,
+                    PlayerType.EXTERNAL
+            );
+        });
         Button back =
                 new Button(
                         "Back to Main Menu"
@@ -132,6 +142,7 @@ public class Main2 extends Application {
                 humanVsAI,
                 aiVsAI,
                 humanVsHuman,
+                humanVsExternal,
                 back
         );
         root.getChildren().setAll(
