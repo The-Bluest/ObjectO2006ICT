@@ -2,6 +2,7 @@ package org.example;
 
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 public class boardeval {
     // stateless evaluator: one shared instance is enough for the whole app
@@ -23,11 +24,10 @@ public class boardeval {
     }
 
     public int maximumHeight(int[][] board){
-        int tallest=0;
-        for(int col=0; col< board.length ;col++ ){
-            tallest=Math.max(tallest,columnHeight(board, col));
-        }
-        return tallest;
+        return IntStream.range(0, board.length)
+                .map(col -> columnHeight(board, col))
+                .max()
+                .orElse(0);
     }
 
     public int holes(int[][] board){ //counts empty cells that have a filled cell somewhere above them
@@ -46,13 +46,9 @@ public class boardeval {
     }
 
     public int bumpiness(int[][] board){
-        int total=0;
-        for(int col = 0; col<board.length-1; col++){
-            int left=columnHeight(board, col);
-            int right=columnHeight(board,col+1);
-            total+=Math.abs(left-right);
-        }
-        return total;
+        return IntStream.range(0, board.length - 1)
+                .map(col -> Math.abs(columnHeight(board, col) - columnHeight(board, col + 1)))
+                .sum();
     }
 
 

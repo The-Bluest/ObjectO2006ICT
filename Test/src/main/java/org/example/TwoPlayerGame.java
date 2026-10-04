@@ -99,12 +99,14 @@ public class TwoPlayerGame {
         boards.setAlignment(Pos.CENTER);
         // paused = false;
         gameState = new RunningState();
+        boards.setFocusTraversable(true)；
         pausedLabel = new Label("PAUSED");
         pausedLabel.setStyle("-fx-font-size: 18px;" + "-fx-font-weight: bold;" + "-fx-text-fill: red;"
         );
         pausedLabel.setVisible(false);
-
-        Button pauseButton = new Button("Pause");
+        Button pauseButton =
+                new Button("Pause");
+        pauseButton.setFocusTraversable(false);
         pauseButton.setOnAction(event -> {
                 togglePaused(pauseButton);
             }
@@ -112,6 +114,7 @@ public class TwoPlayerGame {
 
         Button quitButton =
                 new Button("Quit");
+        quitButton.setFocusTraversable(false);
         quitButton.setOnAction(event -> {
             stop();
             if (onBackToMenu != null) {
@@ -120,6 +123,7 @@ public class TwoPlayerGame {
         });
         Button backButton =
                 new Button("Back to Menu");
+        backButton.setFocusTraversable(false);
         backButton.setOnAction(event -> {
             stop();
             if (onBackToMenu != null) {
@@ -173,6 +177,8 @@ public class TwoPlayerGame {
         });
         startGameLoop();
         setupControls(root);
+        // arrow keys default to JavaFX focus traversal unless something neutral owns focus first
+        Platform.runLater(boards::requestFocus);
     }
 
     // Player 1 = WASD, Player 2 = Arrow keys

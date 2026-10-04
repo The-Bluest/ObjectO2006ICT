@@ -2,15 +2,8 @@ package org.example;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 /**
  * User-configurable game settings persisted as JSON.
@@ -29,6 +22,8 @@ public class Settings {
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .create();
+    private static final JsonFileStore<Settings> STORE =
+            new JsonFileStore<>(GSON, Settings.class);
 
     private int gameHeight = 16;
     private int gameWidth = 8;
@@ -36,8 +31,7 @@ public class Settings {
     private boolean musicEnabled = true;
     private boolean sfxEnabled = true;
     private int difficulty = 1;
-    private boolean aiPlay;
-    private boolean externalPlayer;
+    private PlayerType playerMode = PlayerType.HUMAN;
 
     private transient Path file = DEFAULT_FILE;
 
@@ -57,23 +51,10 @@ public class Settings {
             throw new IllegalArgumentException("Settings file cannot be null");
         }
 
-        if (!Files.exists(file)) {
-            return new Settings(file);
-        }
-
-        try (Reader reader = Files.newBufferedReader(file)) {
-            Settings loaded = GSON.fromJson(reader, Settings.class);
-            if (loaded == null) {
-                return new Settings(file);
-            }
-            loaded.file = file;
-            loaded.normalise();
-            return loaded;
-        } catch (IOException | JsonParseException | IllegalStateException exception) {
-            System.err.println("Could not load settings from " + file + ": "
-                    + exception.getMessage());
-            return new Settings(file);
-        }
+        Settings loaded = STORE.load(file, new Settings(file));
+        loaded.file = file;
+        loaded.normalise();
+        return loaded;
     }
 
     public void save() {
@@ -86,33 +67,8 @@ public class Settings {
         }
 
         normalise();
-        Path absoluteFile = file.toAbsolutePath();
-        Path parent = absoluteFile.getParent();
-        Path temporaryFile = absoluteFile.resolveSibling(
-                absoluteFile.getFileName() + ".tmp");
-
-        try {
-            if (parent != null) {
-                Files.createDirectories(parent);
-            }
-
-            try (Writer writer = Files.newBufferedWriter(temporaryFile)) {
-                GSON.toJson(this, Settings.class, writer);
-            }
-
-            moveIntoPlace(temporaryFile, absoluteFile);
-            this.file = file;
-        } catch (IOException exception) {
-            try {
-                Files.deleteIfExists(temporaryFile);
-            } catch (IOException cleanupException) {
-                exception.addSuppressed(cleanupException);
-            }
-            throw new IllegalStateException(
-                    "Could not save settings to " + file,
-                    exception
-            );
-        }
+        STORE.save(file, this);
+        this.file = file;
     }
 
     public int getGameHeight() {
@@ -171,19 +127,19 @@ public class Settings {
     }
 
     public boolean isAiEnabled() {
-        return aiPlay;
-    }
-
-    public void setAiPlay(boolean aiPlay) {
-        this.aiPlay = aiPlay;
+        return playerMode == PlayerType.AI;
     }
 
     public boolean isExternalPlayerEnabled() {
-        return externalPlayer;
+        return playerMode == PlayerType.EXTERNAL;
     }
 
-    public void setExternalPlayer(boolean externalPlayer) {
-        this.externalPlayer = externalPlayer;
+    public PlayerType getPlayerMode() {
+        return playerMode;
+    }
+
+    public void setPlayerMode(PlayerType playerMode) {
+        this.playerMode = playerMode == null ? PlayerType.HUMAN : playerMode;
     }
 
     private void normalise() {
@@ -195,27 +151,12 @@ public class Settings {
             gameSpeed = Math.max(MIN_SPEED, Math.min(MAX_SPEED, gameSpeed));
         }
         difficulty = clamp(difficulty, MIN_DIFFICULTY, MAX_DIFFICULTY);
+        if (playerMode == null) {
+            playerMode = PlayerType.HUMAN;
+        }
     }
 
     private static int clamp(int value, int minimum, int maximum) {
         return Math.max(minimum, Math.min(maximum, value));
-    }
-
-    private static void moveIntoPlace(Path temporaryFile, Path targetFile)
-            throws IOException {
-        try {
-            Files.move(
-                    temporaryFile,
-                    targetFile,
-                    StandardCopyOption.ATOMIC_MOVE,
-                    StandardCopyOption.REPLACE_EXISTING
-            );
-        } catch (AtomicMoveNotSupportedException exception) {
-            Files.move(
-                    temporaryFile,
-                    targetFile,
-                    StandardCopyOption.REPLACE_EXISTING
-            );
-        }
     }
 }

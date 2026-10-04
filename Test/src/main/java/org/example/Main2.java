@@ -8,8 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -392,51 +394,36 @@ public class Main2 extends Application {
                 settings.isSfxEnabled()
         );
 
-        // AI Play
-        CheckBox AiPlay =
-                new CheckBox("Enable AI Play?");
+        // Who controls the single-player piece: Human, AI, or an external server
+        Label playerModeLabel = new Label("Player Mode");
+        ToggleGroup playerModeGroup = new ToggleGroup();
 
-        AiPlay.setSelected(
-                settings.isAiEnabled()
+        RadioButton humanMode = new RadioButton("Human");
+        humanMode.setToggleGroup(playerModeGroup);
+        humanMode.setUserData(PlayerType.HUMAN);
+
+        RadioButton aiMode = new RadioButton("AI Play");
+        aiMode.setToggleGroup(playerModeGroup);
+        aiMode.setUserData(PlayerType.AI);
+
+        RadioButton externalMode = new RadioButton("External Server");
+        externalMode.setToggleGroup(playerModeGroup);
+        externalMode.setUserData(PlayerType.EXTERNAL);
+
+        playerModeGroup.getToggles().stream()
+                .filter(toggle -> toggle.getUserData() == settings.getPlayerMode())
+                .findFirst()
+                .ifPresent(playerModeGroup::selectToggle);
+
+        playerModeGroup.selectedToggleProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != null) {
+                        settings.setPlayerMode(
+                                (PlayerType) newValue.getUserData()
+                        );
+                    }
+                }
         );
-
-        // External Player
-        CheckBox externalPlay =
-                new CheckBox("Enable External Player?");
-
-        externalPlay.setSelected(
-                settings.isExternalPlayerEnabled()
-        );
-
-        // AI checkbox action
-        AiPlay.setOnAction(event -> {
-
-            settings.setAiPlay(
-                    AiPlay.isSelected()
-            );
-
-            if (AiPlay.isSelected()) {
-
-                externalPlay.setSelected(false);
-
-                settings.setExternalPlayer(false);
-            }
-        });
-
-        // External Player checkbox action
-        externalPlay.setOnAction(event -> {
-
-            settings.setExternalPlayer(
-                    externalPlay.isSelected()
-            );
-
-            if (externalPlay.isSelected()) {
-
-                AiPlay.setSelected(false);
-
-                settings.setAiPlay(false);
-            }
-        });
 
         sfx.setOnAction(event -> {
 
@@ -470,8 +457,10 @@ public class Main2 extends Application {
                 difficulty,
                 music,
                 sfx,
-                AiPlay,
-                externalPlay,
+                playerModeLabel,
+                humanMode,
+                aiMode,
+                externalMode,
                 back
         );
 
