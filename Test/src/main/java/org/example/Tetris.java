@@ -42,6 +42,8 @@ public class Tetris {
     private static int linesNo = 0;
     private static Text pausedText;
     private static Text externalWarningText;
+    private Text musicStatusText;
+    private Text sfxStatusText;
     private Runnable onGameOver;
     private int fallInterval;
     private static final int fastFallInterval = 60;
@@ -91,8 +93,6 @@ public class Tetris {
 
         audioManager.setMusicEnabled(settings.isMusicEnabled());
         audioManager.setSfxEnabled(settings.isSfxEnabled());
-        audioManager.setMusicEnabled(settings.isMusicEnabled());
-        audioManager.setSfxEnabled(settings.isSfxEnabled());
 
         groupe.getChildren().clear();
         score = 0;
@@ -125,6 +125,15 @@ public class Tetris {
         level.setStyle("-fx-font: 20 arial;");
         level.setY(100);
         level.setX(xMax + 5);
+        musicStatusText = new Text();
+        musicStatusText.setStyle("-fx-font: 16 arial;");
+        musicStatusText.setX(xMax + 5);
+        musicStatusText.setY(130);
+        sfxStatusText = new Text();
+        sfxStatusText.setStyle("-fx-font: 16 arial;");
+        sfxStatusText.setX(xMax + 5);
+        sfxStatusText.setY(155);
+        updateAudioStatusText();
         level.setFill(Color.GREEN);
         pausedText = new Text("PAUSED");
         pausedText.setFill(Color.RED);
@@ -138,7 +147,14 @@ public class Tetris {
         externalWarningText.setX((xMax - externalWarningText.getLayoutBounds().getWidth()) / 2);
         externalWarningText.setY(yMax / 2.0);
         externalWarningText.setVisible(false);
-        groupe.getChildren().addAll(scoretext, line, level, pausedText, externalWarningText);
+        groupe.getChildren().addAll(
+                scoretext,
+                line,
+                level,
+                musicStatusText,
+                sfxStatusText,
+                pausedText,
+                externalWarningText);
 
         form a = nextObj;
         groupe.getChildren().addAll(a.a, a.b, a.c, a.d);
@@ -391,6 +407,43 @@ public class Tetris {
         );
     }
 
+    private void updateAudioStatusText() {
+
+        if (musicStatusText != null) {
+            musicStatusText.setText("Music: " + (settings.isMusicEnabled() ? "ON" : "OFF") + " [M]");
+            musicStatusText.setFill(settings.isMusicEnabled() ? Color.GREEN : Color.RED);
+        }
+
+        if (sfxStatusText != null) {
+            sfxStatusText.setText("Sound: " + (settings.isSfxEnabled() ? "ON" : "OFF") + " [S]");
+            sfxStatusText.setFill(settings.isSfxEnabled() ? Color.GREEN : Color.RED);
+        }
+    }
+
+    private void toggleMusic() {
+        boolean newState = !settings.isMusicEnabled();
+        settings.setMusicEnabled(newState);
+        audioManager.setMusicEnabled(newState);
+        updateAudioStatusText();
+        saveAudioSettings();
+    }
+
+    private void toggleSfx() {
+        boolean newState = !settings.isSfxEnabled();
+        settings.setSfxEnabled(newState);
+        audioManager.setSfxEnabled(newState);
+        updateAudioStatusText();
+        saveAudioSettings();
+    }
+
+    private void saveAudioSettings() {
+        try {
+            settings.save();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void stopMusic() {
         if (audioManager != null) {
             audioManager.stopMusic();
@@ -406,16 +459,15 @@ public class Tetris {
         //}
     }
     private void playClearSound() {
-        if (settings != null && settings.isSfxEnabled()) {
             audioManager.playClearSound();
-        }
     }
 
     private void moveOnKeyPress(form form) { //org.example.controller heavy movement of piece.
+
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
             @Override
             public void handle(KeyEvent event) {
-
 //                System.out.println(
 //                        "KEY PRESSED: " + event.getCode()
 //                                + " | AI = " + settings.isAiEnabled()
@@ -427,38 +479,61 @@ public class Tetris {
                     pausedText.setVisible(paused);
                     return;
                 }
-                if (paused)
+
+                if (event.getCode() == KeyCode.M) {
+                    toggleMusic();
                     return;
-                if (settings.isAiEnabled() || settings.isExternalPlayerEnabled())
+                }
+
+                if (event.getCode() == KeyCode.S) {
+                    toggleSfx();
                     return;
+                }
+
+                if (paused) {
+                    return;
+                }
+
+                if (settings.isAiEnabled() || settings.isExternalPlayerEnabled()) {
+                    return;
+                }
+
                 switch (event.getCode()) {
                     case RIGHT:
-                        controller.moveRight(form);
+                        if (controller.moveRight(form)) {
                             playMoveSound();
-
+                        }
                         break;
+
                     case DOWN:
-                        // hold to fall faster instead of slamming straight to the bottom
                         fastFall = true;
                         playMoveSound();
                         break;
 
                     case LEFT:
-                        controller.moveLeft(form);
+                        if (controller.moveLeft(form)) {
                             playMoveSound();
+                        }
                         break;
 
                     case UP:
                         MoveTurn(form);
+                        playMoveSound();
+                        break;
+
+                    default:
                         break;
                 }
             }
         });
+
         scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+
             @Override
             public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.DOWN)
+                if (event.getCode() == KeyCode.DOWN) {
                     fastFall = false;
+                }
             }
         });
     }
@@ -829,7 +904,7 @@ public class Tetris {
             full = 0;
         }
         if (!lines.isEmpty()){
-            audioManager.playClearSound();
+            playClearSound();
 
             do {
                 for (Node node : pane.getChildren()) {
