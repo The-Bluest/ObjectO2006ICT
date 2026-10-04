@@ -23,12 +23,25 @@ public class TwoPlayerGame {
     private PlayerBoard player2;
     private Timeline gameLoop;
     private final SharedPieceSequence sharedSequence;
-    private boolean paused = false;
+
+    //private boolean paused = false;
+    private GameState gameState;                  // advanced pattern 2: state pattern
     private Label pausedLabel;
+
+    private GameCommand player1LeftCommand;       // advanced pattern 1:command pattern
+    private GameCommand player1RightCommand;
+    private GameCommand player1DownCommand;
+    private GameCommand player1RotateCommand;
+    private GameCommand player2LeftCommand;
+    private GameCommand player2RightCommand;
+    private GameCommand player2DownCommand;
+    private GameCommand player2RotateCommand;
+
     public TwoPlayerGame(Settings settings) {
         this.settings = settings;
         this.sharedSequence =
                 new SharedPieceSequence();
+        this.gameState = new RunningState();
     }
 
     public void start(
@@ -51,6 +64,17 @@ public class TwoPlayerGame {
                         sharedSequence,
                         settings
                 );
+
+        player1LeftCommand = new PlayerMoveCommand(player1, PlayerBoard.Action.LEFT);
+        player1RightCommand = new PlayerMoveCommand(player1, PlayerBoard.Action.RIGHT);
+        player1DownCommand = new PlayerMoveCommand(player1, PlayerBoard.Action.DOWN);
+        player1RotateCommand = new PlayerMoveCommand(player1, PlayerBoard.Action.ROTATE);
+
+        player2LeftCommand = new PlayerMoveCommand(player2, PlayerBoard.Action.LEFT);
+        player2RightCommand = new PlayerMoveCommand(player2, PlayerBoard.Action.RIGHT);
+        player2DownCommand = new PlayerMoveCommand(player2, PlayerBoard.Action.DOWN);
+        player2RotateCommand = new PlayerMoveCommand(player2, PlayerBoard.Action.ROTATE);
+
         Label title =
                 new Label("Two Player Mode");
         title.setStyle(
@@ -73,21 +97,21 @@ public class TwoPlayerGame {
                         player2.getView()
                 );
         boards.setAlignment(Pos.CENTER);
-        boards.setFocusTraversable(true);
-        paused = false;
+        // paused = false;
+        gameState = new RunningState();
+        boards.setFocusTraversable(true)；
         pausedLabel = new Label("PAUSED");
-        pausedLabel.setStyle(
-                "-fx-font-size: 18px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: red;"
+        pausedLabel.setStyle("-fx-font-size: 18px;" + "-fx-font-weight: bold;" + "-fx-text-fill: red;"
         );
         pausedLabel.setVisible(false);
         Button pauseButton =
                 new Button("Pause");
         pauseButton.setFocusTraversable(false);
         pauseButton.setOnAction(event -> {
-            togglePaused(pauseButton);
-        });
+                togglePaused(pauseButton);
+            }
+        );
+
         Button quitButton =
                 new Button("Quit");
         quitButton.setFocusTraversable(false);
@@ -162,67 +186,64 @@ public class TwoPlayerGame {
         root.getScene().setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.P) {
                 togglePaused(null);
+                event.consume();
                 return;
             }
-            if (paused) {
-                return;
-            }
+
             switch (event.getCode()) {
-                case A -> player1.handleInput(PlayerBoard.Action.LEFT);
-                case D -> player1.handleInput(PlayerBoard.Action.RIGHT);
-                case S -> player1.handleInput(PlayerBoard.Action.DOWN);
-                case W -> player1.handleInput(PlayerBoard.Action.ROTATE);
-                case LEFT -> player2.handleInput(PlayerBoard.Action.LEFT);
-                case RIGHT -> player2.handleInput(PlayerBoard.Action.RIGHT);
-                case DOWN -> player2.handleInput(PlayerBoard.Action.DOWN);
-                case UP -> player2.handleInput(PlayerBoard.Action.ROTATE);
+                case A -> gameState.handleCommand(player1LeftCommand);
+                case D -> gameState.handleCommand(player1RightCommand);
+                case S -> gameState.handleCommand(player1DownCommand);
+                case W -> gameState.handleCommand(player1RotateCommand);
+
+                case LEFT -> gameState.handleCommand(player2LeftCommand);
+                case RIGHT -> gameState.handleCommand(player2RightCommand);
+                case DOWN -> gameState.handleCommand(player2DownCommand);
+                case UP -> gameState.handleCommand(player2RotateCommand);
                 default -> {
+                    return;
                 }
             }
+            event.consume();
         });
     }
 
     private void togglePaused(Button pauseButton) {
-        paused = !paused;
+        // paused = !paused;
+        gameState = gameState.toggleState();
+        boolean paused = gameState.isPaused();
+
         pausedLabel.setVisible(paused);
         if (pauseButton != null) {
             pauseButton.setText(paused ? "Resume" : "Pause");
         }
     }
 
+    void updatePlayers(int tickMs) {
+        if (!player1.isGameOver()) {
+            player1.tick(tickMs);
+        }
+        if (!player2.isGameOver()) {
+            player2.tick(tickMs);
+        }
+    }
+
     private void startGameLoop() {
+
         final int tickMs = 30;
-        gameLoop =
-                new Timeline(
-                        new KeyFrame(
-                                Duration.millis(tickMs),
-                                event -> {
-                                    if (paused) {
-                                        return;
-                                    }
-                                    if (!player1.isGameOver()) {
-                                        player1.tick(
-                                                tickMs
-                                        );
-                                    }
-                                    if (!player2.isGameOver()) {
-                                        player2.tick(
-                                                tickMs
-                                        );
-                                    }
-                                    if (
-                                            player1.isGameOver()
-                                                    &&
-                                                    player2.isGameOver()
-                                    ) {
-                                        gameLoop.stop();
-                                    }
-                                }
-                        )
-                );
+        gameLoop = new Timeline(new KeyFrame(Duration.millis(tickMs), event -> {
+            gameState.handleTick(this, tickMs);
+            if (player1.isGameOver() && player2.isGameOver()) {
+                gameLoop.stop();
+                }
+                }
+            )
+        );
+
         gameLoop.setCycleCount(
                 Timeline.INDEFINITE
         );
+
         gameLoop.play();
     }
 

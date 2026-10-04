@@ -119,6 +119,15 @@ public class Tetris {
         level.setStyle("-fx-font: 20 arial;");
         level.setY(100);
         level.setX(xMax + 5);
+        musicStatusText = new Text();
+        musicStatusText.setStyle("-fx-font: 16 arial;");
+        musicStatusText.setX(xMax + 5);
+        musicStatusText.setY(130);
+        sfxStatusText = new Text();
+        sfxStatusText.setStyle("-fx-font: 16 arial;");
+        sfxStatusText.setX(xMax + 5);
+        sfxStatusText.setY(155);
+        updateAudioStatusText();
         level.setFill(Color.GREEN);
         musicStatusText = new Text(
                 "Music: " + (settings.isMusicEnabled() ? "ON" : "OFF")
@@ -407,6 +416,43 @@ public class Tetris {
         );
     }
 
+    private void updateAudioStatusText() {
+
+        if (musicStatusText != null) {
+            musicStatusText.setText("Music: " + (settings.isMusicEnabled() ? "ON" : "OFF") + " [M]");
+            musicStatusText.setFill(settings.isMusicEnabled() ? Color.GREEN : Color.RED);
+        }
+
+        if (sfxStatusText != null) {
+            sfxStatusText.setText("Sound: " + (settings.isSfxEnabled() ? "ON" : "OFF") + " [S]");
+            sfxStatusText.setFill(settings.isSfxEnabled() ? Color.GREEN : Color.RED);
+        }
+    }
+
+    private void toggleMusic() {
+        boolean newState = !settings.isMusicEnabled();
+        settings.setMusicEnabled(newState);
+        audioManager.setMusicEnabled(newState);
+        updateAudioStatusText();
+        saveAudioSettings();
+    }
+
+    private void toggleSfx() {
+        boolean newState = !settings.isSfxEnabled();
+        settings.setSfxEnabled(newState);
+        audioManager.setSfxEnabled(newState);
+        updateAudioStatusText();
+        saveAudioSettings();
+    }
+
+    private void saveAudioSettings() {
+        try {
+            settings.save();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void stopMusic() {
         if (audioManager != null) {
             audioManager.stopMusic();
@@ -422,16 +468,15 @@ public class Tetris {
         //}
     }
     private void playClearSound() {
-        if (settings != null && settings.isSfxEnabled()) {
             audioManager.playClearSound();
-        }
     }
 
     private void moveOnKeyPress(form form) { //org.example.controller heavy movement of piece.
+
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
             @Override
             public void handle(KeyEvent event) {
-
 //                System.out.println(
 //                        "KEY PRESSED: " + event.getCode()
 //                                + " | AI = " + settings.isAiEnabled()
@@ -445,61 +490,59 @@ public class Tetris {
                 }
 
                 if (event.getCode() == KeyCode.M) {
-                    boolean newMusicState = !settings.isMusicEnabled();
-
-                    settings.setMusicEnabled(newMusicState);
-                    audioManager.setMusicEnabled(newMusicState);
-
-                    musicStatusText.setText(
-                            "Music: " + (newMusicState ? "ON" : "OFF")
-                    );
+                    toggleMusic();
                     return;
                 }
 
                 if (event.getCode() == KeyCode.S) {
-                    boolean newSfxState = !settings.isSfxEnabled();
-
-                    settings.setSfxEnabled(newSfxState);
-                    audioManager.setSfxEnabled(newSfxState);
-
-                    sfxStatusText.setText(
-                            "Sound: " + (newSfxState ? "ON" : "OFF")
-                    );
+                    toggleSfx();
                     return;
                 }
 
-                if (paused)
+                if (paused) {
                     return;
-                if (settings.isAiEnabled() || settings.isExternalPlayerEnabled())
+                }
+
+                if (settings.isAiEnabled() || settings.isExternalPlayerEnabled()) {
                     return;
+                }
+
                 switch (event.getCode()) {
                     case RIGHT:
-                        controller.moveRight(form);
+                        if (controller.moveRight(form)) {
                             playMoveSound();
-
+                        }
                         break;
+
                     case DOWN:
-                        // hold to fall faster instead of slamming straight to the bottom
                         fastFall = true;
                         playMoveSound();
                         break;
 
                     case LEFT:
-                        controller.moveLeft(form);
+                        if (controller.moveLeft(form)) {
                             playMoveSound();
+                        }
                         break;
 
                     case UP:
                         MoveTurn(form);
+                        playMoveSound();
+                        break;
+
+                    default:
                         break;
                 }
             }
         });
+
         scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+
             @Override
             public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.DOWN)
+                if (event.getCode() == KeyCode.DOWN) {
                     fastFall = false;
+                }
             }
         });
     }
@@ -870,7 +913,7 @@ public class Tetris {
             full = 0;
         }
         if (!lines.isEmpty()){
-            audioManager.playClearSound();
+            playClearSound();
 
             do {
                 for (Node node : pane.getChildren()) {
