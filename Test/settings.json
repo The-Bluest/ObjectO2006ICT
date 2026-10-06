@@ -5,5 +5,5 @@
   "musicEnabled": true,
   "sfxEnabled": true,
   "difficulty": 1,
-  "playerMode": "HUMAN"
+  "playerMode": "EXTERNAL"
 }
