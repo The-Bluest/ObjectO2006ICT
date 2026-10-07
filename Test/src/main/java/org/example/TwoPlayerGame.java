@@ -99,7 +99,7 @@ public class TwoPlayerGame {
         boards.setAlignment(Pos.CENTER);
         // paused = false;
         gameState = new RunningState();
-        boards.setFocusTraversable(true)；
+        boards.setFocusTraversable(true);
         pausedLabel = new Label("PAUSED");
         pausedLabel.setStyle("-fx-font-size: 18px;" + "-fx-font-weight: bold;" + "-fx-text-fill: red;"
         );
