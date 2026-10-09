@@ -3,8 +3,13 @@ package org.example;
 import javafx.scene.shape.Rectangle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -83,23 +88,42 @@ class controllerTest {
         assertFalse(controller.moveLeft(piece));
     }
 
-    @Test
-    void makeShapeCentersPieceOnGivenBoardWidth() {
-        form piece = controller.makeShape("line", 8 * controller.size);
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("tetrominoOffsets")
+    void makeShapeCentersEachTetrominoOnGivenBoardWidth(String name, int[] xOffsets, int[] yOffsets) {
+        form piece = controller.makeShape(name, Tetris.xMax);
+        int center = (Tetris.xMax / controller.size / 2) * controller.size;
 
-        assertEquals("line", piece.getName());
-        int center = (8 / 2) * controller.size;
-        assertEquals(center - 2 * controller.size, piece.a.getX());
-        assertEquals(center - controller.size, piece.b.getX());
-        assertEquals(center, piece.c.getX());
-        assertEquals(center + controller.size, piece.d.getX());
+        assertEquals(name, piece.getName());
+        assertEquals(center + xOffsets[0] * controller.size, piece.a.getX());
+        assertEquals(center + xOffsets[1] * controller.size, piece.b.getX());
+        assertEquals(center + xOffsets[2] * controller.size, piece.c.getX());
+        assertEquals(center + xOffsets[3] * controller.size, piece.d.getX());
+        assertEquals(yOffsets[0] * controller.size, piece.a.getY());
+        assertEquals(yOffsets[1] * controller.size, piece.b.getY());
+        assertEquals(yOffsets[2] * controller.size, piece.c.getY());
+        assertEquals(yOffsets[3] * controller.size, piece.d.getY());
     }
 
-    @Test
-    void makeShapeRejectsUnknownTetrominoName() {
+    static Stream<Arguments> tetrominoOffsets() {
+        // offsets are in units of controller.size, relative to the board's horizontal center
+        return Stream.of(
+                Arguments.of("l", new int[]{-1, -1, 0, 1}, new int[]{0, 1, 1, 1}),
+                Arguments.of("ll", new int[]{1, -1, 0, 1}, new int[]{0, 1, 1, 1}),
+                Arguments.of("square", new int[]{-1, 0, -1, 0}, new int[]{0, 0, 1, 1}),
+                Arguments.of("s", new int[]{1, 0, 0, -1}, new int[]{0, 0, 1, 1}),
+                Arguments.of("zig", new int[]{1, 0, 1, 2}, new int[]{0, 0, 1, 1}),
+                Arguments.of("t", new int[]{-1, 0, 0, 1}, new int[]{0, 0, 1, 0}),
+                Arguments.of("line", new int[]{-2, -1, 0, 1}, new int[]{0, 0, 0, 0})
+        );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"hexagon", "pentagon", "circle", "", "SQUARE"})
+    void makeShapeRejectsUnknownTetrominoNames(String name) {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> controller.makeShape("hexagon", Tetris.xMax)
+                () -> controller.makeShape(name, Tetris.xMax)
         );
     }
 
